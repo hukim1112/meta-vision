@@ -29,4 +29,11 @@ class Feature_Extractor(tf.keras.Model):
         x = self.feature_extractor(input)
         return x
 
-class FeatureL2Norm(tf.keras.layers.Layer):
+class FeatureL2Norm(keras.layers.Layer):
+    #Channel-wise L2 normalization
+    def __init__(self):
+        super(FeatureL2Norm, self).__init__()
+    def call(self, feature):
+        epsilon = 1e-6
+        norm = tf.expand_dims(tf.pow(tf.reduce_sum(tf.pow(feature, 2), axis=-1)+epsilon, 0.5), axis=-1)
+        return tf.math.divide(feature, norm)
