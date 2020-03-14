@@ -23,11 +23,19 @@ class Protonet_trainer():
 
     @staticmethod
     def on_end_epoch(self, epoch):
+        test_n_episode = self.config['test']['n_episode']
+        # Validation
+        for i_episode in range(test_n_episode):
+            support, query = val_ds.get_next_episode()
+            loss, pred, eq, acc = self.val_step(support, query, self.model)
+            self.val_loss(loss)
+            self.val_acc(acc)
+
         template = 'Epoch {}, Loss: {}, Accuracy: {}, ' \
                    'Val Loss: {}, Val Accuracy: {}'
         print(template.format(epoch + 1, self.train_loss.result(), self.train_acc.result() * 100,
                               self.val_loss.result(), self.val_acc.result() * 100))
-        if (epoch + 1) != 0 & (epoch + 1) % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             self.model.save(os.path.join(
                 self.config['checkpoint_dir'], self.config['model_name'] + '_{}.h5'.format(epoch + 1)))
 
@@ -39,13 +47,3 @@ class Protonet_trainer():
             support, query, self.model, self.optimizer)
         self.train_loss(loss)
         self.train_acc(acc)
-
-    @staticmethod
-    def on_end_episode(self, val_ds):
-        test_n_episode = self.config['test']['n_episode']
-        # Validation
-        for i_episode in range(test_n_episode):
-            support, query = val_ds.get_next_episode()
-            loss, pred, eq, acc = self.val_step(support, query, self.model)
-            self.val_loss(loss)
-            self.val_acc(acc)
