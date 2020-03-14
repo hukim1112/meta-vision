@@ -1,0 +1,30 @@
+{
+    "dataset_name" : "mini_imagenet",
+    "data_dir" : "/home/files/datasets/mini_imagenet",
+    "input_shape" : [84, 84, 3],
+    "model_name" : "prototypical_networks",
+    "checkpoint_dir" : "checkpoints",
+    "train":
+    {        
+        "gpu_id" : "0",
+        "n_epoch" : 300,
+        "n_episode" : 100,
+        "n_way" : 30,
+        "n_support" : 5,
+        "n_query" : 15,
+        "learning_rate" : 0.001,
+        "patience" : 50,
+        "pretrained_type" : "base",
+        "checkpoint_name" : "None"
+    },
+    "test":
+    {
+        "gpu_id" : "0",
+        "n_episode" : 100,
+        "n_way" : 5,
+        "n_support" : 5,
+        "n_query" : 15,
+        "pretrained_type" : "latest",
+        "checkpoint_name" : "None"
+    }
+}
