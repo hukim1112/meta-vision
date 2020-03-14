@@ -14,14 +14,12 @@ class Protonet_trainer():
         self.train_acc = tf.metrics.Mean(name='train_accuracy')
         self.val_acc = tf.metrics.Mean(name='val_accuracy')
 
-    @staticmethod
     def on_start_epoch(self):
         self.train_loss.reset_states()
         self.val_loss.reset_states()
         self.train_acc.reset_states()
         self.val_acc.reset_states()
 
-    @staticmethod
     def on_end_epoch(self, epoch):
         test_n_episode = self.config['test']['n_episode']
         # Validation
@@ -39,7 +37,6 @@ class Protonet_trainer():
             self.model.save(os.path.join(
                 self.config['checkpoint_dir'], self.config['model_name'] + '_{}.h5'.format(epoch + 1)))
 
-    @staticmethod
     def on_start_episode(self, support, query, epi):
         if epi % 20 == 0:
             print(f"Episode {epi}")

@@ -1,6 +1,6 @@
 {
     "dataset_name" : "mini_imagenet",
-    "data_dir" : "/home/files/datasets/mini_imagenet",
+    "data_dir" : "/home/files/mini_imagenet",
     "input_shape" : [84, 84, 3],
     "model_name" : "prototypical_networks",
     "checkpoint_dir" : "checkpoints",

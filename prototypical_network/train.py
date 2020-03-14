@@ -33,8 +33,7 @@ def main():
         for epi in range(train_config['n_episode']):
             support, query = train_ds.get_next_episode()
             trainer.on_start_episode(support, query, epi)
-            trainer.on_end_episode(val_ds)
-        trainer.on_end_epoch(epoch)
+        trainer.on_end_epoch(epoch, val_ds)
     print("Training ended.")
     return
 
