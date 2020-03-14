@@ -23,7 +23,7 @@ def main():
     train_ds, val_ds = ds['train'], ds['val']
     model = model_load('train', config)
     optimizer = tf.keras.optimizers.Adam(train_config['learning_rate'])
-    trainer = Protonet_trainer(model, train_step, val_step, config, optimizer)
+    trainer = Protonet_trainer(model, train_step, train_ds, val_step, val_ds, config, optimizer)
 
     Path(config['checkpoint_dir']).mkdir(parents=True, exist_ok=True)
     # Training process
@@ -31,9 +31,8 @@ def main():
     for epoch in range(train_config['n_epoch']):
         trainer.on_start_epoch()
         for epi in range(train_config['n_episode']):
-            support, query = train_ds.get_next_episode()
-            trainer.on_start_episode(support, query, epi)
-        trainer.on_end_epoch(epoch, val_ds)
+            trainer.train_episode(epi)
+        trainer.on_end_epoch(epoch)
     print("Training ended.")
     return
 
