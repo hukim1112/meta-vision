@@ -32,8 +32,5 @@ def load_mini_imagenet(splits, config):
         data = tf.data.Dataset.from_tensor_slices(data)
         if split == 'train':
             data = data.shuffle(4000).repeat()
-        ds[split] = data.map(data_process)
+        ds[split] = data
     return ds
-
-def data_process(image):
-    return tf.py_function(make_synthesized_image_pair, [image, (64, 64), 0.2], [tf.float32, tf.float32, tf.float32])

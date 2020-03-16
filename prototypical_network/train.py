@@ -1,11 +1,10 @@
-import os
-import json
+import os, json
 from utils import parser, session_config
-from data_loader import data_load
-from models import model_load
+from pathlib import Path
+from data_loader import load_data
+from models import load_model
 from trainers.trainer import Protonet_trainer
 from matplotlib import pyplot as plt
-from pathlib import Path
 import tensorflow as tf
 
 
@@ -19,9 +18,9 @@ def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = train_config['gpu_id']
     session_config.setup_gpus(True, 0.9)
 
-    ds = data_load(['train', 'val'], config)
+    ds = load_data(['train', 'val'], config)
     train_ds, val_ds = ds['train'], ds['val']
-    model = model_load('train', config)
+    model = load_model('train', config)
     optimizer = tf.keras.optimizers.Adam(train_config['learning_rate'])
     trainer = Protonet_trainer(model, train_step, train_ds, val_step, val_ds, config, optimizer)
 

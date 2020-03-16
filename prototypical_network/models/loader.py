@@ -1,7 +1,7 @@
 from .prototypical_network import Prototypical_network
 
 
-def model_load(split, config):
+def load_model(split, config):
     """
     Load specific dataset.
 checkpoint_load(model, pretrained_type, checkpoint_name)

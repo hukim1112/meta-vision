@@ -2,7 +2,7 @@ from .mini_imagenet import load_mini_imagenet
 from .omniglot import load_omniglot
 
 
-def data_load(splits, config):
+def load_data(splits, config):
     """
     Load specific dataset.
 

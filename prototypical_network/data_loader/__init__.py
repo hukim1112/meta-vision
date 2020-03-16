@@ -1,1 +1,1 @@
-from .loader import data_load
+from .loader import load_data
