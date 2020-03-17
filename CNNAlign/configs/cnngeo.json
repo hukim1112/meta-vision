@@ -1,0 +1,20 @@
+{
+    "dataset_name" : "mini_imagenet",
+    "processing" : "random_TPS",
+    "data_dir" : "/home/files/datasets/mini_imagenet",
+    "input_shape" : [84, 84, 3],
+    "model_name" : "CNNgeo",
+    "checkpoint_dir" : "checkpoints",
+    "train":
+    {        
+        "n_examples" : 100
+    },
+    "val":
+    {
+        "n_examples" : 100
+    },
+    "test":
+    {
+        "n_examples" : 100
+    }
+}

@@ -1,8 +1,11 @@
 import tensorflow as tf
-import os, pickle
+import os
+import pickle
 import numpy as np
 from utils.image import make_synthesized_image_pair
 import cv2
+
+
 def load_mini_imagenet(splits, config):
     """
     Load miniImagenet dataset.
@@ -21,14 +24,15 @@ def load_mini_imagenet(splits, config):
         # load dict with 'class_dict' and 'image_data' keys
         with open(ds_filename, 'rb') as f:
             data_dict = pickle.load(f)
-        
+
         # Convert original data to format [n_classes, n_img, w, h, c]
         first_key = list(data_dict['class_dict'])[0]
-        data = np.zeros((len(data_dict['class_dict']), len(data_dict['class_dict'][first_key]), 84, 84, 3))
+        data = np.zeros((len(data_dict['class_dict']), len(
+            data_dict['class_dict'][first_key]), 84, 84, 3))
         for i, (k, v) in enumerate(data_dict['class_dict'].items()):
             data[i, :, :, :, :] = data_dict['image_data'][v, :]
         data /= 255.
-        data = np.reshape(data, [-1, 84, 84, 3])
+        data = np.reshape(data, [-1, 84, 84, 3])[:config[split]['n_examples']]
         data = tf.data.Dataset.from_tensor_slices(data)
         if split == 'train':
             data = data.shuffle(4000).repeat()

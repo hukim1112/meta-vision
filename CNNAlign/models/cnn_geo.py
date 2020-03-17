@@ -1,18 +1,19 @@
 from .modules import Feature_Extractor, Correlation_network, Spatial_transformer_regressor
 import tensorflow as tf
 
+
 class CNN_geo(tf.keras.Model):
-    def __init__(self):
+    def __init__(self, backbone_name):
         super(CNN_geo, self).__init__()
-        self.feature_extractor = Feature_Extractor()
+        self.feature_extractor = Feature_Extractor(backbone_name)
         self.correlation_network = Correlation_network()
         self.geo_parameter_regressor = Spatial_transformer_regressor(18)
-    def call(self, _input):
-        num_image_pair = _input.shape[0]/2
-        features = self.feature_extractor(_input)
-        features = self.feature_extractor.channelwise_l2_normalize(features)
-        featureA, featureB = features[:num_image_pair], features[num_image_pair:]
-        corr_scores = Correlation_network(featureA, featureB)
-        geo_parameters = geo_parameter_regressor(corr_scores)
-        return geo_parameters
 
+    def call(self, image_A, image_B):
+        feature_A = self.feature_extractor(image_A)
+        feature_B = self.feature_extractor(image_B)
+        feature_A = self.feature_extractor.channelwise_l2_normalize(feature_A)
+        feature_B = self.feature_extractor.channelwise_l2_normalize(feature_B)
+        corr_scores = self.correlation_network(feature_A, feature_B)
+        geo_parameters = self.geo_parameter_regressor(corr_scores)
+        return geo_parameters
