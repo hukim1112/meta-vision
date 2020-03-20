@@ -1,18 +1,30 @@
 import tensorflow as tf
 import numpy as np
 import cv2
-def data_process(image):
-    return tf.py_function(image_process, [image], [tf.float32])
-def image_process(image):
-    image = image.numpy()
-    return cv2.resize(image, (56, 56))
+import json
+from data_loader import load_data
 
-fashion_mnist = tf.keras.datasets.fashion_mnist
-(train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
 
-ds = tf.data.Dataset.from_tensor_slices(train_images)
-ds = ds.map(data_process)
+def show_warped(img1, img2, name1, name2):
+    cv2.imwrite(name1, img1)
+    cv2.imwrite(name2, img2)
 
-for i in ds.take(1):
-    print(i)
 
+def main():
+    with open("configs/cnngeo.json") as file:
+        config = json.load(file)
+    splits = ['train', 'val', 'test']
+    datasets = load_data(splits, config)
+    split = 'train'
+    train_ds = datasets[split].batch(1)
+    for i, j, k in train_ds.take(1):
+        print(i.shape)
+        print(j.shape)
+        # a = i.numpy() * 255
+        # b = j.numpy() * 255
+        # show_warped(a, b, '{}_1.jpg'.format(
+        #     split), '{}_2.jpg'.format(split))
+
+
+if __name__ == "__main__":
+    main()

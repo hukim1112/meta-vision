@@ -7,14 +7,14 @@
     "checkpoint_dir" : "checkpoints",
     "train":
     {        
-        "n_examples" : 100
+        "n_examples" : 2
     },
     "val":
     {
-        "n_examples" : 100
+        "n_examples" : 2
     },
     "test":
     {
-        "n_examples" : 100
+        "n_examples" : 2
     }
 }

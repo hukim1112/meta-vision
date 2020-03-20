@@ -31,10 +31,16 @@ def load_mini_imagenet(splits, config):
             data_dict['class_dict'][first_key]), 84, 84, 3))
         for i, (k, v) in enumerate(data_dict['class_dict'].items()):
             data[i, :, :, :, :] = data_dict['image_data'][v, :]
+        data = np.reshape(data, [-1, 84, 84, 3])
+        np.random.shuffle(data)
+        data = data[:config[split]['n_examples']]
         data /= 255.
-        data = np.reshape(data, [-1, 84, 84, 3])[:config[split]['n_examples']]
         data = tf.data.Dataset.from_tensor_slices(data)
         if split == 'train':
-            data = data.shuffle(4000).repeat()
+            if config['train']['n_examples'] > 1000:
+                shuffle_buffer = 1000
+            else:
+                shuffle_buffer = config['train']['n_examples']
+            data = data.shuffle(shuffle_buffer)
         ds[split] = data
     return ds
