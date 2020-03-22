@@ -60,6 +60,8 @@ def synthesize_image(image, bbox=None, pad_ratio=None, moving_vectors=None):
 
         output : padded_image, moving_vectors(sampled randomly)
     '''
+    if moving_vectors = None:
+        moving_vectors = (np.random.rand(9, 2) - 0.5) * 2 * tps_random_rate
     if bbox == None:
         src_points = np.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
                                [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
@@ -67,15 +69,21 @@ def synthesize_image(image, bbox=None, pad_ratio=None, moving_vectors=None):
     else:
         # rescaling coordinates of bbox into 0 to 1.0
         nx0, ny0, nx1, ny1 = normalize_bbox(bbox, image.shape[:2])
-        src_points = np.array([[nx0, ny0], [(nx0 + nx1) / 2, ny0], [nx1, ny0],
-                               [nx0, (ny0 + ny1) / 2], [(nx0 + nx1) / 2,
-                                                        (ny0 + ny1) / 2], [nx1, (ny0 + ny1) / 2],
-                               [nx0, ny1], [(nx0 + nx1) / 2, ny1], [nx1, ny1]])
+        src_points = np.array([[nx0, ny0],
+                               [(nx0 + nx1) / 2, ny0],
+                               [nx1, ny0],
+                               [nx0, (ny0 + ny1) / 2],
+                               [(nx0 + nx1) / 2, (ny0 + ny1) / 2],
+                               [nx1, (ny0 + ny1) / 2],
+                               [nx0, ny1],
+                               [(nx0 + nx1) / 2, ny1],
+                               [nx1, ny1]])
+        moving_vectors[:, 0] = moving_vectors[:, 0] * (nx1 - nx0)
+        moving_vectors[:, 1] = moving_vectors[:, 1] * (ny1 - ny0)
     if pad_ratio == None:
         nx0, ny0 = src_points[0]
         nx1, ny1 = src_points[-1]
         bbox = denormalize_bbox((nx0, ny0, nx1, ny1), image.shape[:2])
-
     else:
         image = pad_image(image, pad_ratio)
 
@@ -86,9 +94,10 @@ def synthesize_image(image, bbox=None, pad_ratio=None, moving_vectors=None):
         nx0, ny0 = src_points[0]
         nx1, ny1 = src_points[-1]
         bbox = denormalize_bbox((nx0, ny0, nx1, ny1), image.shape)
+        moving_vectors[:, 0] = moving_vectors[:, 0] / (2 * pad_ratio)
+        moving_vectors[:, 1] = moving_vectors[:, 1] / (2 * pad_ratio)
 
     dst_points = src_points + moving_vectors
-
     x_min, y_min, x_max, y_max = bbox
     warped_image = interpolate_with_TPS(image, src_points, dst_points)
     return warped_image[y_min:y_max, x_min:x_max], moving_vectors
@@ -117,10 +126,8 @@ def denormalize_bbox(coord, shape):
 def make_synthesized_image_pair(image, output_size=(64, 64), tps_random_rate=0.4):
     image = image.numpy()
     cropped_image, bbox = crop_image_randomly(image, output_size)
-    moving_vectors = (np.random.rand(9, 2) - 0.5) * 2 * tps_random_rate
     pad_ratio = 0.25
-    warped_image, moving_vectors = synthesize_image(
-        image, bbox, pad_ratio, moving_vectors)
+    warped_image, moving_vectors = synthesize_image(image, bbox, pad_ratio)
     return cropped_image, warped_image, moving_vectors
 
 
