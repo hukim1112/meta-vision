@@ -12,6 +12,9 @@ def load_data(splits, config):
     if config['processing'] == 'random_TPS':
         for split in splits:
             ds[split] = ds[split].map(make_pair_with_random_TPS)
+    elif config['processing'] == 'debug':
+        for split in splits:
+            ds[split] = ds[split]
     else:
         raise ValueError("Wrong data processing type : {}".format(
             config['processing']))
