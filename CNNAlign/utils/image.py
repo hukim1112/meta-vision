@@ -62,6 +62,7 @@ def synthesize_image(image, bbox=None, pad_ratio=None, moving_vectors=None, tps_
     '''
     if moving_vectors is None:
         moving_vectors = (np.random.rand(9, 2) - 0.5) * 2 * tps_random_rate
+    #print(moving_vectors)
     if bbox is None:
         src_points = np.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
                                [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
@@ -78,10 +79,9 @@ def synthesize_image(image, bbox=None, pad_ratio=None, moving_vectors=None, tps_
                                [nx0, ny1],
                                [(nx0 + nx1) / 2, ny1],
                                [nx1, ny1]])
-        print('1', moving_vectors)
         moving_vectors[:, 0] = moving_vectors[:, 0] * (nx1 - nx0)
         moving_vectors[:, 1] = moving_vectors[:, 1] * (ny1 - ny0)
-        print('2', moving_vectors)
+    #print(moving_vectors)
     if pad_ratio is None:
         nx0, ny0 = src_points[0]
         nx1, ny1 = src_points[-1]
@@ -96,9 +96,8 @@ def synthesize_image(image, bbox=None, pad_ratio=None, moving_vectors=None, tps_
         nx0, ny0 = src_points[0]
         nx1, ny1 = src_points[-1]
         bbox = denormalize_bbox((nx0, ny0, nx1, ny1), image.shape)
-        moving_vectors[:, 0] = moving_vectors[:, 0] / (2 * pad_ratio)
-        moving_vectors[:, 1] = moving_vectors[:, 1] / (2 * pad_ratio)
-
+        moving_vectors[:, 0] = moving_vectors[:, 0] / (1+2 * pad_ratio)
+        moving_vectors[:, 1] = moving_vectors[:, 1] / (1+2 * pad_ratio)
     dst_points = src_points + moving_vectors
     x_min, y_min, x_max, y_max = bbox
     warped_image = interpolate_with_TPS(image, src_points, dst_points)
@@ -128,9 +127,9 @@ def denormalize_bbox(coord, shape):
 def make_synthesized_image_pair(image, output_size=(64, 64), tps_random_rate=0.4):
     image = image.numpy()
     cropped_image, bbox = crop_image_randomly(image, output_size)
-    pad_ratio = 0.25
+    pad_ratio = 0.2
     warped_image, moving_vectors = synthesize_image(
-        image, bbox, pad_ratio, tps_random_rate)
+        image.copy(), bbox, pad_ratio, moving_vectors = None, tps_random_rate = tps_random_rate)
     return cropped_image, warped_image, moving_vectors
 
 
