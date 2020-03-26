@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from .mini_imagenet import load_mini_imagenet
 from utils.image import make_synthesized_image_pair
 
@@ -10,8 +11,9 @@ def load_data(splits, config):
         raise ValueError("Wrong dataset name : {}".format(
             config['dataset_name']))
     if config['processing'] == 'random_TPS':
+        tf_func = data_process(use_py_function, config)
         for split in splits:
-            ds[split] = ds[split].map(make_pair_with_random_TPS)
+            ds[split] = ds[split].map(tf_func)
     elif config['processing'] == 'debug':
         for split in splits:
             ds[split] = ds[split]
@@ -20,6 +22,14 @@ def load_data(splits, config):
             config['processing']))
     return ds
 
+def data_process(function, config):
+    tps_random_rate = config['train']['tps_random_rate']
+    pad_ratio = config['train']['pad_ratio']
+    output_size = config['image_shape'][:2]
+    moving_vectors = (np.random.rand(9, 2) - 0.5) * 2 * tps_random_rate
+    def wrapper(image):
+        return function(image, moving_vectors, pad_ratio, output_size)
+    return wrapper
 
-def make_pair_with_random_TPS(image):
-    return tf.py_function(make_synthesized_image_pair, [image, (64, 64), 0.2], [tf.float32, tf.float32, tf.float32])
+def use_py_function(image, moving_vectors, pad_ratio, output_size):
+    return tf.py_function(make_synthesized_image_pair, [image, moving_vectors, pad_ratio, output_size], [tf.float32, tf.float32, tf.float32])

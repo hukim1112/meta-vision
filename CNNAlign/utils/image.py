@@ -49,20 +49,17 @@ def pad_image(image, pad_ratio):
     return padded_image
 
 
-def synthesize_image(image, bbox=None, pad_ratio=None, moving_vectors=None, tps_random_rate=0.4):
+def synthesize_image(image, moving_vectors, out_size, bbox=None, pad_ratio=None):
     '''
         input : 
                 'original image', 
+                'moving_vectors' : None or array of 9 vectors which get source points moved into destination points.
                 'bbox' : None or a tuple of 4 integers. A tuple of 4 values which means (x_min, y_min, x_max, y_max) of a cropping box respectively. It exists when the image is cropped.
                 'pad_ratio' : None or a float number.
                 It exists when the image is padded.
-                'moving_vectors' : None or array of 9 vectors which get source points moved into destination points.
-
+                
         output : padded_image, moving_vectors(sampled randomly)
     '''
-    if moving_vectors is None:
-        moving_vectors = (np.random.rand(9, 2) - 0.5) * 2 * tps_random_rate
-    #print(moving_vectors)
     if bbox is None:
         src_points = np.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
                                [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
@@ -81,25 +78,26 @@ def synthesize_image(image, bbox=None, pad_ratio=None, moving_vectors=None, tps_
                                [nx1, ny1]])
         moving_vectors[:, 0] = moving_vectors[:, 0] * (nx1 - nx0)
         moving_vectors[:, 1] = moving_vectors[:, 1] * (ny1 - ny0)
-    #print(moving_vectors)
+
     if pad_ratio is None:
         nx0, ny0 = src_points[0]
         nx1, ny1 = src_points[-1]
         bbox = denormalize_bbox((nx0, ny0, nx1, ny1), image.shape[:2])
     else:
         image = pad_image(image, pad_ratio)
-
+        print(image.shape)
         def convert_coord_by_pad_ratio(p): return (
             p + pad_ratio) / (1 + 2 * pad_ratio)
         vfunc = np.vectorize(convert_coord_by_pad_ratio)
         src_points = vfunc(src_points)
         nx0, ny0 = src_points[0]
         nx1, ny1 = src_points[-1]
-        bbox = denormalize_bbox((nx0, ny0, nx1, ny1), image.shape)
+        bbox = denormalize_bbox((nx0, ny0, nx1, ny1), image.shape[:2])
         moving_vectors[:, 0] = moving_vectors[:, 0] / (1+2 * pad_ratio)
         moving_vectors[:, 1] = moving_vectors[:, 1] / (1+2 * pad_ratio)
     dst_points = src_points + moving_vectors
     x_min, y_min, x_max, y_max = bbox
+    print(x_min, y_min, x_max, y_max)
     warped_image = interpolate_with_TPS(image, src_points, dst_points)
     return warped_image[y_min:y_max, x_min:x_max], moving_vectors
 
@@ -124,37 +122,10 @@ def denormalize_bbox(coord, shape):
     return x_min, y_min, x_max, y_max
 
 
-def make_synthesized_image_pair(image, output_size=(64, 64), tps_random_rate=0.4):
+def make_synthesized_image_pair(image, moving_vectors, pad_ratio, output_size=(64, 64)):
     image = image.numpy()
+    moving_vectors = moving_vectors.numpy()
     cropped_image, bbox = crop_image_randomly(image, output_size)
-    pad_ratio = 0.2
-    warped_image, moving_vectors = synthesize_image(
-        image.copy(), bbox, pad_ratio, moving_vectors = None, tps_random_rate = tps_random_rate)
+    warped_image, _ = synthesize_image(
+        image.copy(), moving_vectors.copy(), output_size, bbox, pad_ratio)
     return cropped_image, warped_image, moving_vectors
-
-
-def main():
-    image = cv2.imread('image.png')[:, :, ::-1]
-    output_size = (image.shape[0] * 0.8, image.shape[1] * 0.8)
-    cropped_image, bbox = crop_image_randomly(image, output_size)
-    tps_random_rate = 0.4
-    moving_vectors = (np.random.rand(9, 2) - 0.5) * 2 * tps_random_rate
-    # moving_vectors = np.array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0],
-    #                            [0.0, 0.0], [0.0, 0.0], [0.0, 0.0],
-    #                            [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
-    pad_ratio = 0.25
-    warped_image, moving_vectors = synthesize_image(
-        image, bbox, pad_ratio, moving_vectors)
-    print(image.shape, cropped_image.shape, warped_image.shape)
-    fig = plt.figure()
-    ax1 = fig.add_subplot(131)
-    plt.imshow(image)
-    ax2 = fig.add_subplot(132)
-    plt.imshow(cropped_image)
-    ax3 = fig.add_subplot(133)
-    plt.imshow(warped_image)
-    plt.show()
-
-
-if __name__ == "__main__":
-    main()
