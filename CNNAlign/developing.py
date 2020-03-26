@@ -12,13 +12,8 @@ import cv2
 import numpy as np
 
 
-def show_warped(img1, img2, name1, name2):
-    cv2.imwrite(name1, img1)
-    cv2.imwrite(name2, img2)
-
-
 def loss_fn(pred, label):
-    return tf.reduce_mean(tf.keras.losses.MSE(pred, label))
+    return tf.reduce_sum(tf.keras.losses.MSE(pred, label))
 
 
 @tf.function
@@ -34,13 +29,15 @@ def train_step(image_A, image_B, label, model, optimizer):
 def main():
     with open("configs/cnngeo.json") as file:
         config = json.load(file)
-    batch_size = 1
-    splits = ['train', 'val', 'test']
+    batch_size = 5
+    splits = ['train', 'val']
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(batch_size)
+    val_ds = datasets['val'].batch(batch_size)
+
     model = CNN_geo("prototypical_network")
-    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-2)
-    epochs = 1
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
+    epochs = 1000
 
     for epoch in range(epochs):
         print("start of epoch {}".format(epoch))
@@ -48,15 +45,6 @@ def main():
             pred, loss = train_step(image_a, image_b, label, model, optimizer)
             print('Training loss (for one batch) at step {}: {}'.format(
                 step, loss.numpy()))
-
-    for a, b, l in train_ds.take(1):
-        pred = model(a, b)
-    image_a = a.numpy()
-    image_b = b.numpy()
-    l = l.numpy()
-    pred = pred.numpy()
-    data.test_warping_funciton(image_a[0], image_b[0], l)
-
 
 if __name__ == '__main__':
     main()

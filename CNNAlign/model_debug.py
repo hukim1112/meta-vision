@@ -20,15 +20,15 @@ def main():
     train_ds = datasets['val'].batch(batch_size)
 
     model = Feature_Extractor(backbone_name='prototypical_network')
-
+    correlation_network = Correlation_network()
     for c, w, p in train_ds.take(1):
         print(c.shape, w.shape)
         fm_A = model(c)
         fm_B = model(w)
-
-    print(fm_A.shape)
-    print(fm_B.shape)
-    print(p)
+        fm_A_norm = model.channelwise_l2_normalize(fm_A)
+        fm_B_norm = model.channelwise_l2_normalize(fm_B)
+        score = correlation_network(feature_A, feature_B)
+    print(model.channelwise_l2_normalize_debug(fm_A_norm))
 
 if __name__ == '__main__':
     main()
