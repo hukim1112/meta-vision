@@ -4,13 +4,12 @@ from data_loader import load_data
 from models.cnn_geo import CNN_geo
 from models.modules import Feature_Extractor, Correlation_network, Spatial_transformer_regressor
 from geo_transform import tps
-from test_code import data
 
 from matplotlib import pyplot as plt
 import tensorflow as tf
 import cv2
 import numpy as np
-
+from utils import image
 
 def loss_fn(pred, label):
     return tf.reduce_sum(tf.keras.losses.MSE(pred, label))
@@ -27,17 +26,17 @@ def train_step(image_A, image_B, label, model, optimizer):
 
 
 def main():
-    with open("configs/cnngeo.json") as file:
+    with open("configs/gpu_cnngeo.json") as file:
         config = json.load(file)
-    batch_size = 5
+    batch_size = 1
     splits = ['train', 'val']
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(batch_size)
     val_ds = datasets['val'].batch(batch_size)
 
     model = CNN_geo("prototypical_network")
-    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
-    epochs = 1000
+    optimizer = tf.keras.optimizers.Adam(learning_rate=config['train']['learning_rate'])
+    epochs = 100
 
     for epoch in range(epochs):
         print("start of epoch {}".format(epoch))
@@ -45,6 +44,21 @@ def main():
             pred, loss = train_step(image_a, image_b, label, model, optimizer)
             print('Training loss (for one batch) at step {}: {}'.format(
                 step, loss.numpy()))
+    
+    for a, b, p in train_ds.take(1):
+        pred = model(a, b)
+        print(pred)
+        print(p)
+    image_a = a.numpy()[0]*255
+    image_b = b.numpy()[0]*255
+
+    np_pred = np.reshape(pred.numpy()[0], (9, 2))
+    warp_image, _ = image.synthesize_image(image_a.copy(), np_pred.copy(), (64, 64), bbox=None, pad_ratio=None)
+    print(warp_image.shape)
+    cv2.imwrite('image_a.jpg', image_a)
+    cv2.imwrite('image_b.jpg', image_b)
+    cv2.imwrite('warped_image_a.jpg', warp_image)
+
 
 if __name__ == '__main__':
     main()
