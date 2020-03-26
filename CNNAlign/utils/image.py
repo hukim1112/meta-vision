@@ -49,7 +49,7 @@ def pad_image(image, pad_ratio):
     return padded_image
 
 
-def synthesize_image(image, moving_vectors, out_size, bbox=None, pad_ratio=None):
+def synthesize_image(image, moving_vectors, output_size, bbox=None, pad_ratio=None):
     '''
         input : 
                 'original image', 
@@ -85,7 +85,6 @@ def synthesize_image(image, moving_vectors, out_size, bbox=None, pad_ratio=None)
         bbox = denormalize_bbox((nx0, ny0, nx1, ny1), image.shape[:2])
     else:
         image = pad_image(image, pad_ratio)
-        print(image.shape)
         def convert_coord_by_pad_ratio(p): return (
             p + pad_ratio) / (1 + 2 * pad_ratio)
         vfunc = np.vectorize(convert_coord_by_pad_ratio)
@@ -97,9 +96,11 @@ def synthesize_image(image, moving_vectors, out_size, bbox=None, pad_ratio=None)
         moving_vectors[:, 1] = moving_vectors[:, 1] / (1+2 * pad_ratio)
     dst_points = src_points + moving_vectors
     x_min, y_min, x_max, y_max = bbox
-    print(x_min, y_min, x_max, y_max)
     warped_image = interpolate_with_TPS(image, src_points, dst_points)
-    return warped_image[y_min:y_max, x_min:x_max], moving_vectors
+    if warped_image.shape[0]<y_min+output_size[0] or warped_image.shape[1]<x_min+output_size[1]:
+    	raise ValueError("Index {} is out of bound of image shape {}".format((y_min+output_size[0], x_min+output_size[1]),
+    																		  warped_image.shape))
+    return warped_image[y_min:y_min+output_size[0], x_min:x_min+output_size[1]], moving_vectors
 
 
 def normalize_bbox(coord, shape):
