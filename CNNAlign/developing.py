@@ -70,7 +70,7 @@ def main():
 
         if epoch == 0 or (epoch + 1) % 20 == 0:
             model.save_weights(os.path.join(
-                config['checkpoints'], config['model_name'] + "_{}.h5".format(epoch + 1)))
+                config['checkpoint_dir'], config['model_name'] + "_{}.h5".format(epoch + 1)))
 
 
 '''
