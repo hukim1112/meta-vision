@@ -10,7 +10,7 @@ import tensorflow as tf
 import cv2
 import numpy as np
 from utils import image
-
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 def loss_fn(pred, label):
     return tf.reduce_sum(tf.keras.losses.MSE(pred, label))
@@ -34,9 +34,9 @@ def val_step(image_A, image_B, label, model):
 
 
 def main():
-    with open("configs/gpu_cnngeo.json") as file:
+    with open("configs/lab_cnngeo.json") as file:
         config = json.load(file)
-    batch_size = 32
+    batch_size = 128
     splits = ['train', 'val']
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(batch_size)
@@ -49,8 +49,6 @@ def main():
 
     train_loss = tf.metrics.Mean(name='train_loss')
     val_loss = tf.metrics.Mean(name='val_loss')
-
-    train_loss(loss)
 
     for epoch in range(epochs):
         print("start of epoch {}".format(epoch + 1))
