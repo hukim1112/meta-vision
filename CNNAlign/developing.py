@@ -50,8 +50,6 @@ def main():
     train_loss = tf.metrics.Mean(name='train_loss')
     val_loss = tf.metrics.Mean(name='val_loss')
 
-    train_loss(loss)
-
     for epoch in range(epochs):
         print("start of epoch {}".format(epoch + 1))
         for step, (image_a, image_b, label) in enumerate(train_ds):
