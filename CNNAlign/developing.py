@@ -34,9 +34,18 @@ def val_step(image_A, image_B, label, model):
 
 
 def main():
-    with open("configs/lab_cnngeo.json") as file:
+    argparser = argparse.ArgumentParser(description=__doc__)
+    argparser.add_argument(
+        '-c', '--config',
+        metavar='C',
+        default='None',
+        help='The Configuration file')
+    args = argparser.parse_args()
+    config = args.config
+    with open(config) as file:
         config = json.load(file)
-    batch_size = 128
+
+    batch_size = config['train']['batch_size']
     splits = ['train', 'val']
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(batch_size)
