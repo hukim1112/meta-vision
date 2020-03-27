@@ -34,13 +34,14 @@ def load_mini_imagenet(splits, config):
         data = np.reshape(data, [-1, 84, 84, 3])
         np.random.shuffle(data)
         data = data[:config[split]['n_examples']]
+        n_examples = len(data)
         data /= 255.
         data = tf.data.Dataset.from_tensor_slices(data)
         if split == 'train':
-            if config['train']['n_examples'] > 1000:
+            if n_examples > 1000:
                 shuffle_buffer = 1000
             else:
-                shuffle_buffer = config['train']['n_examples']
+                shuffle_buffer = n_examples
             data = data.shuffle(shuffle_buffer)
         ds[split] = data
     return ds

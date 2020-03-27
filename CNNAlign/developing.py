@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 from utils import image
 
+
 def loss_fn(pred, label):
     return tf.reduce_sum(tf.keras.losses.MSE(pred, label))
 
@@ -25,26 +26,56 @@ def train_step(image_A, image_B, label, model, optimizer):
     return pred, loss
 
 
+@tf.function
+def val_step(image_A, image_B, label, model):
+    pred = model(image_A, image_B)
+    loss = loss_fn(pred, tf.reshape(label, [-1, 18]))
+    return pred, loss
+
+
 def main():
     with open("configs/gpu_cnngeo.json") as file:
         config = json.load(file)
-    batch_size = 1
+    batch_size = 32
     splits = ['train', 'val']
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(batch_size)
     val_ds = datasets['val'].batch(batch_size)
 
     model = CNN_geo("prototypical_network")
-    optimizer = tf.keras.optimizers.Adam(learning_rate=config['train']['learning_rate'])
+    optimizer = tf.keras.optimizers.Adam(
+        learning_rate=config['train']['learning_rate'])
     epochs = 100
 
+    train_loss = tf.metrics.Mean(name='train_loss')
+    val_loss = tf.metrics.Mean(name='val_loss')
+
+    train_loss(loss)
+
     for epoch in range(epochs):
-        print("start of epoch {}".format(epoch))
+        print("start of epoch {}".format(epoch + 1))
         for step, (image_a, image_b, label) in enumerate(train_ds):
             pred, loss = train_step(image_a, image_b, label, model, optimizer)
-            print('Training loss (for one batch) at step {}: {}'.format(
-                step, loss.numpy()))
-    
+            train_loss(loss)
+            if step % 100 == 0:
+                print('Training loss (for one batch) at step {}: {}'.format(
+                    step, loss.numpy()))
+        for image_a, image_b, label in val_ds:
+            pred, loss = val_step(image_a, image_b, label, model)
+            val_loss(loss)
+        template = 'Epoch {}, Loss: {}, ' \
+                   'Val Loss: {}'
+        print(template.format(epoch + 1, train_loss.result(), val_loss.result()))
+        print("end of epoch.")
+        train_loss.reset_states()
+        val_loss.reset_states()
+
+        if epoch == 0 or (epoch + 1) % 20 == 0:
+            model.save_weights(os.path.join(
+                config['checkpoints'], config['model_name'] + "_{}.h5".format(epoch + 1)))
+
+
+'''
     for a, b, p in train_ds.take(1):
         pred = model(a, b)
         print(pred)
@@ -58,7 +89,7 @@ def main():
     cv2.imwrite('image_a.jpg', image_a)
     cv2.imwrite('image_b.jpg', image_b)
     cv2.imwrite('warped_image_a.jpg', warp_image)
-
+'''
 
 if __name__ == '__main__':
     main()

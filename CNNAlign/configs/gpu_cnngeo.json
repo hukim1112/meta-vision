@@ -7,17 +7,17 @@
     "checkpoint_dir" : "checkpoints",
     "train":
     {        
-        "n_examples" : 1,
+        "n_examples" : -1,
         "tps_random_rate" : 0.2,
         "pad_ratio" : 0.2,
 	"learning_rate" : 1e-5
     },
     "val":
     {
-        "n_examples" : 1
+        "n_examples" : -1
     },
     "test":
     {
-        "n_examples" : 10
+        "n_examples" : -1
     }
 }
