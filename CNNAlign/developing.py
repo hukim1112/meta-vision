@@ -10,7 +10,7 @@ import tensorflow as tf
 import cv2
 import numpy as np
 from utils import image
-
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 def loss_fn(pred, label):
     return tf.reduce_sum(tf.keras.losses.MSE(pred, label))
@@ -34,9 +34,9 @@ def val_step(image_A, image_B, label, model):
 
 
 def main():
-    with open("configs/gpu_cnngeo.json") as file:
+    with open("configs/lab_cnngeo.json") as file:
         config = json.load(file)
-    batch_size = 32
+    batch_size = 128
     splits = ['train', 'val']
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(batch_size)
@@ -70,7 +70,7 @@ def main():
 
         if epoch == 0 or (epoch + 1) % 20 == 0:
             model.save_weights(os.path.join(
-                config['checkpoints'], config['model_name'] + "_{}.h5".format(epoch + 1)))
+                config['checkpoint_dir'], config['model_name'] + "_{}.h5".format(epoch + 1)))
 
 
 '''
