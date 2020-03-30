@@ -72,7 +72,7 @@ def main():
             train_loss(t_loss)
             if step % 100 == 0:
                 print('Training loss (for one batch) at step {}: {}'.format(
-                    step, loss.numpy()))
+                    step, t_loss.numpy()))
         for image_a, image_b, label in val_ds:
             pred, v_loss = val_step(image_a, image_b, label, model)
             val_loss(v_loss)
