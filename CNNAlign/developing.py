@@ -47,7 +47,7 @@ def main():
     with open(config) as file:
         config = json.load(file)
 
-        log_dir = 'logs/train'
+    log_dir = 'logs/train'
     summary_writer = tf.summary.create_file_writer(log_dir)
 
     batch_size = config['train']['batch_size']
