@@ -10,12 +10,12 @@ from matplotlib import pyplot as plt
 import tensorflow as tf
 import cv2
 import numpy as np
-from utils import image
+from utils import image, manage_checkpoint
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 
 def loss_fn(pred, label):
-    return tf.reduce_sum(tf.keras.losses.MSE(pred, label))
+    return tf.reduce_mean(tf.keras.losses.MSE(pred, label))
 
 
 @tf.function
@@ -64,6 +64,9 @@ def main():
     train_loss = tf.metrics.Mean(name='train_loss')
     val_loss = tf.metrics.Mean(name='val_loss')
 
+    ckpt_dir = os.path.join('checkpoints', config['model_name'], config['experiment_desciment'])
+    saver = manage_checkpoint.Saver(ckpt_dir, save_type='local_minimum', interval=10, max_to_keep=10)
+
     for epoch in range(epochs):
         print("start of epoch {}".format(epoch + 1))
         for step, (image_a, image_b, label) in enumerate(train_ds):
@@ -85,14 +88,10 @@ def main():
                 'train_loss', train_loss.result(), step=epoch + 1)
             tf.summary.scalar('val_loss', val_loss.result(), step=epoch + 1)
             summary_writer.flush()
+        # Save your model
+        saver.save_or_not(model, epoch, val_loss.result())
         train_loss.reset_states()
         val_loss.reset_states()
-
-        # Save your model
-        if epoch == 0 or (epoch + 1) % 5 == 0:
-            model.save_weights(os.path.join(
-                config['checkpoint_dir'], config['model_name'] + "_{}.h5".format(epoch + 1)))
-
 
 '''
     for a, b, p in train_ds.take(1):
