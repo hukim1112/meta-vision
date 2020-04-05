@@ -64,7 +64,7 @@ def main():
     train_loss = tf.metrics.Mean(name='train_loss')
     val_loss = tf.metrics.Mean(name='val_loss')
 
-    ckpt_dir = os.path.join('checkpoints', config['model_name'], config['experiment_desciment'])
+    ckpt_dir = os.path.join('checkpoints', config['model_name'], config['exp_desc'])
     saver = manage_checkpoint.Saver(ckpt_dir, save_type='local_minimum', interval=10, max_to_keep=10)
 
     for epoch in range(epochs):
@@ -73,7 +73,7 @@ def main():
             pred, t_loss = train_step(
                 image_a, image_b, label, model, optimizer)
             train_loss(t_loss)
-            if step % 100 == 0:
+            if step % 20 == 0:
                 print('Training loss (for one batch) at step {}: {}'.format(
                     step, t_loss.numpy()))
         for image_a, image_b, label in val_ds:
