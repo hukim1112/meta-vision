@@ -9,7 +9,7 @@ class Saver():
             self.interval_queue = []
         self.ckpt_dir = ckpt_dir
         self.makedirs(self.ckpt_dir)
-        self.save_type = 'best'
+        self.save_type = save_type
         self.max_to_keep = max_to_keep
         self.eval_queue = []
     def makedirs(self, path):
@@ -27,6 +27,8 @@ class Saver():
             self.save(model, epoch)
             epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)
         elif self.save_type == 'best':
+            if len(self.eval_queue == 0):
+                self.save(model, epoch)
             if self.eval_queue[-1]['loss'] > loss:
                 self.save(model, epoch)
                 epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)            
