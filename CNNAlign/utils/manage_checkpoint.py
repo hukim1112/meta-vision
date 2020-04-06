@@ -29,7 +29,7 @@ class Saver():
         elif self.save_type == 'best':
             if len(self.eval_queue) == 0:
                 self.save(model, epoch)
-		epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)
+                epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)
             elif self.eval_queue[-1]['loss'] > loss:
                 self.save(model, epoch)
                 epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)
