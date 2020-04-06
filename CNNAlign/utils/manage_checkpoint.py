@@ -27,11 +27,12 @@ class Saver():
             self.save(model, epoch)
             epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)
         elif self.save_type == 'best':
-            if len(self.eval_queue == 0):
+            if len(self.eval_queue) == 0:
                 self.save(model, epoch)
-            if self.eval_queue[-1]['loss'] > loss:
+		epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)
+            elif self.eval_queue[-1]['loss'] > loss:
                 self.save(model, epoch)
-                epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)            
+                epoch_to_delete = self._queue(self.eval_queue, epoch, loss, self.max_to_keep)
         else: #self.save_type == 'local_minimum'
               #x* is a local minimum when loss(x*) < loss(x), all x*-interval <= x <= x*+interval 
             self._queue(self.interval_queue, epoch, loss, self.interval+1)

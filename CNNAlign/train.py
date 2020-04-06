@@ -47,9 +47,6 @@ def main():
     with open(config) as file:
         config = json.load(file)
 
-    log_dir = 'logs/train'
-    summary_writer = tf.summary.create_file_writer(log_dir)
-
     batch_size = config['train']['batch_size']
     splits = ['train', 'val']
     datasets = load_data(splits, config)
@@ -65,10 +62,11 @@ def main():
     val_loss = tf.metrics.Mean(name='val_loss')
 
     ckpt_dir = os.path.join('checkpoints', config['model_name'], config['exp_desc'])
-    saver1 = manage_checkpoint.Saver(ckpt_dir+'/latest', save_type='latest', interval=10, max_to_keep=10)
-    saver2 = manage_checkpoint.Saver(ckpt_dir+'/best', save_type='best', interval=10, max_to_keep=10)
+    log_dir = os.path.join('logs', config['model_name'], config['exp_desc'])
+    saver1 = manage_checkpoint.Saver(ckpt_dir+'/latest', save_type='latest', max_to_keep=10)
+    saver2 = manage_checkpoint.Saver(ckpt_dir+'/best', save_type='best', max_to_keep=10)
     saver3 = manage_checkpoint.Saver(ckpt_dir+'/local_minimum', save_type='local_minimum', interval=10, max_to_keep=10)
-
+    summary_writer = tf.summary.create_file_writer(log_dir)
 
     for epoch in range(epochs):
         print("start of epoch {}".format(epoch + 1))
