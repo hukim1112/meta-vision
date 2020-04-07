@@ -36,7 +36,7 @@ class Correlation_network(tf.keras.layers.Layer):
     def call(self, feature_A, feature_B):
         # featureA : feature information from source image
         # featureB : feature information from target image
-        assert feature_A.shape == feature_B.shape
+        #assert feature_A.shape == feature_B.shape
         # new feature A and feature B have new shape of tensors.
         # featureA has tensor shape as [batch, HA, WA, 1, 1, depth]
         # featureB has tensor shape as [batch, 1, 1, HB, WB, depth]

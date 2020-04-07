@@ -3,4 +3,4 @@ __pycache__/
 logs/
 outputs/
 .ipynb_checkpoints
-*.pyc
+.pyc
