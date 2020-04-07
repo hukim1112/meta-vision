@@ -35,7 +35,7 @@ def load_mini_imagenet(splits, config):
         np.random.shuffle(data)
         data = data[:config[split]['n_examples']]
         n_examples = len(data)
-	print("{} dataset amount : {}".format(split, n_examples))
+        print("{} dataset amount : {}".format(split, n_examples))
         data /= 255.
         data = tf.data.Dataset.from_tensor_slices(data)
         if split == 'train':
