@@ -50,7 +50,7 @@ def main():
     batch_size = config['train']['batch_size']
     splits = ['train', 'val']
     datasets = load_data(splits, config)
-    train_ds = datasets['train'].batch(batch_size)
+    train_ds = datasets['train'].batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
     val_ds = datasets['val'].batch(batch_size)
 
     model = CNN_geo("prototypical_network")
