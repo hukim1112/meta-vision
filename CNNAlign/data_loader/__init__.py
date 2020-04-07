@@ -13,7 +13,7 @@ def load_data(splits, config):
     if config['processing'] == 'random_TPS':
         tf_func = data_process(use_py_function, config)
         for split in splits:
-            ds[split] = ds[split].map(tf_func)
+            ds[split] = ds[split].map(tf_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     elif config['processing'] == 'debug':
         for split in splits:
             ds[split] = ds[split]
