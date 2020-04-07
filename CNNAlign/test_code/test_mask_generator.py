@@ -13,29 +13,18 @@ def main():
                            [0.0, 1.0], [5.0, 1.0], [1.0, 1.0]])
 
     dshape = (8, 8)
-    multiplyer = dshape[0] - 1
-    grid = tps.uniform_grid(dshape)
+    map_size = (dshape[0] - 1, dshape[1] - 1)
     theta = tps.tps_theta_from_points(src_points, dst_points, reduced=True)
-    grid2 = tps.tps_grid(theta, dst_points, dshape)
-    # mapx, mapy = tps.tps_grid_to_remap(grid2, dshape)
-    # # print(mapx[0])
-    # # print(grid)
-    # # print(grid.shape)
-    # print(mapx, '\n', mapy)
+    grid = tps.tps_grid(theta, dst_points, dshape)
+    print(grid.shape)
+    grid = grid[np.newaxis, :, :, :]
+    grid = grid * map_size
 
-    print(grid2 * (dshape[0] - 1, dshape[1] - 1))
-    print(grid2.shape)
-    # grid3 = grid2[np.newaxis, :, :, :]
-    # print(grid3.shape)
+    binary_mask = generate_binary_mask(grid3, thresh=1.0)
 
-    # print(grid3[0] * multiplyer)
-
-    # print(grid3[0][4, 4] * multiplyer)
-    # binary_mask = generate_binary_mask(grid3 * multiplyer, thresh=1.0)
-
-    # for i in range(dshape[0]):
-    #     print("({},{})".format(i, i), "a_x, a_y")
-    #     print(binary_mask[0, i, i])
+    for i in range(dshape[0]):
+        print("({},{})".format(i, i), "a_x, a_y")
+        print(binary_mask[0, i, i])
 
 
 def generate_binary_mask(grids, thresh):
