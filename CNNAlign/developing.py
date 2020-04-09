@@ -22,7 +22,7 @@ def test1():
 
 def test2():
     model = CNN_align("prototypical_network")
-    model.cnn_geo.load("model-24.h5")
+    model.cnn_geo.load("trained_cnngeo.h5")
 
 
 if __name__ == '__main__':

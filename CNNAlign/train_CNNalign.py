@@ -13,7 +13,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 
 def loss_fn(pred):
-    return -pred
+    return tf.reduce_mean(-pred)
 
 
 @tf.function
@@ -21,6 +21,8 @@ def train_step(image_A, image_B, label, model, optimizer):
     with tf.GradientTape() as tape:
         inlier_matching, sum_of_inlier_matching = model(image_A, image_B)
         loss = loss_fn(sum_of_inlier_matching)
+	
+    print(loss.numpy())
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     return loss
