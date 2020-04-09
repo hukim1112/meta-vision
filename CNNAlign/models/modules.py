@@ -63,7 +63,7 @@ class Spatial_transformer_regressor(tf.keras.layers.Layer):
 
     def call(self, correlation):
         return self.regressor(correlation)
-
+'''
 class Spatial_transformer_regressor1(tf.keras.layers.Layer):
     def __init__(self, num_param):
         super(Spatial_transformer_regressor, self).__init__()
@@ -80,3 +80,4 @@ class Spatial_transformer_regressor1(tf.keras.layers.Layer):
 
     def call(self, correlation):
         return self.regressor(correlation)
+'''

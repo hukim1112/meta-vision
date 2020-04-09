@@ -52,10 +52,10 @@ def main():
         batch_size).prefetch(tf.data.experimental.AUTOTUNE)
     val_ds = datasets['val'].batch(batch_size)
 
-    model = CNN_align("prototypical_network")
+    model = CNN_align("prototypical_network", config['thresh'])
+    model.load(config['ckpt']['trained_cnngeo'])
     optimizer = tf.keras.optimizers.Adam(
         learning_rate=config['train']['learning_rate'])
-    epochs = 100
 
     train_loss = tf.metrics.Mean(name='train_loss')
     val_loss = tf.metrics.Mean(name='val_loss')
@@ -63,11 +63,10 @@ def main():
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])
     log_dir = os.path.join('logs', config['model_name'], config['exp_desc'])
-    saver = manage_checkpoint.Saver(
-        ckpt_dir + '/latest', save_type='best', max_to_keep=10)
+    saver = manage_checkpoint.Saver(ckpt_dir, config['ckpt']['save_type'], config['ckpt']['max_to_keep'])
     summary_writer = tf.summary.create_file_writer(log_dir)
 
-    for epoch in range(epochs):
+    for epoch in range(config['train']['epochs']):
         print("start of epoch {}".format(epoch + 1))
         for step, (image_a, image_b, label) in enumerate(train_ds):
             t_loss = train_step(
@@ -91,7 +90,8 @@ def main():
         saver.save_or_not(model, epoch + 1, val_loss.result())
         train_loss.reset_states()
         val_loss.reset_states()
-
+    print("Checkpoint directory : ", ckpt_dir)
+    print("Tensorboard log directory : ", log_dir)
 
 if __name__ == '__main__':
     main()

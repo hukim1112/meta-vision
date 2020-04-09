@@ -49,7 +49,7 @@ class Saver():
         if epoch_to_delete is not None:
             self.delete(epoch_to_delete)
     def save(self, model, epoch):
-        model.save_weights(os.path.join(self.ckpt_dir, "model-{}.h5".format(epoch)))
+        model.save(os.path.join(self.ckpt_dir, "{}-{}.h5".format(model.model_name, epoch)))
     def delete(self, epoch):
         path = os.path.join(self.ckpt_dir, "model-{}.h5".format(epoch))
         if os.path.isfile(path):

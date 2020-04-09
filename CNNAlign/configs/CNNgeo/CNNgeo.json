@@ -5,18 +5,25 @@
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
     "model_name" : "CNNgeo",
+    "ckpt":
+    {
+        "save_type" : "best",
+        "max_to_keep" : 10
+    },
     "train":
     {        
         "n_examples" : -1,
         "tps_random_rate" : 0.2,
         "pad_ratio" : 0.2,
-	"learning_rate" : 1e-5,
-	"batch_size" : 128
+        "learning_rate" : 1e-5,
+        "batch_size" : 128,
+        "save_type" : "best",
+        "max_to_keep" : 10
     },
     "val":
     {
         "n_examples" : -1,
-	"batch_size" : 128
+        "batch_size" : 128
     },
     "test":
     {
