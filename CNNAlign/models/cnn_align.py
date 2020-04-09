@@ -31,7 +31,7 @@ class CNN_align(tf.keras.Model):
         inlier_masks = tf.map_fn(lambda x: tf.numpy_function(generate_inlier_mask,
                                                              [x, map_size], tf.float32), geo_parameters)
         inlier_matching = corr_scores * inlier_masks  # B, H, W, H, W
-        return tf.reduce_sum(inlier_matching, axis=(1, 2, 3, 4))
+        return inlier_matching, tf.reduce_sum(inlier_matching, axis=(1, 2, 3, 4))
 
 
 def generate_inlier_mask(moving_vectors, map_size=(16, 16)):
