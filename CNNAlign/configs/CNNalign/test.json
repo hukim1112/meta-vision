@@ -1,0 +1,34 @@
+{
+    "exp_desc" : "200405_get_best_cnnalign",
+    "dataset_name" : "mini_imagenet",
+    "processing" : "random_TPS",
+    "data_dir" : "/home/dan/prj/datasets/mini_imagenet",
+    "image_shape" : [64, 64, 3],
+    "model_name" : "CNNgeo",
+    "thresh" : 1.0,
+    "ckpt":
+    {
+        "trained_cnngeo" : "trained_cnngeo.h5",
+        "save_type" : "best",
+        "max_to_keep" : 10
+    },
+    "train":
+    {        
+        "n_examples" : 100,
+        "tps_random_rate" : 0.2,
+        "pad_ratio" : 0.2,
+        "learning_rate" : 1e-5,
+        "batch_size" : 5,
+        "epochs" : 10
+    },
+    "val":
+    {
+        "n_examples" : 10,
+        "batch_size" : 10
+    },
+    "test":
+    {
+        "n_examples" : -1,
+        "batch_size" : 128
+    }
+}

@@ -33,7 +33,7 @@ def generate_inlier_mask(moving_vectors, map_size, thresh):
     grid = grid * (height - 1, width - 1)
     # coordinates of a_x, a_y, b_x, b_y from feature map A (a_x,a_y) and feature map B (b_x,b_y)
     mask = np.zeros([height, width, height, width])
-    
+    '''
     for b_y in range(height):
         for b_x in range(width):
             # (a_x, a_y) of feature map A matched (b_x, b_y), coord of feature map B
@@ -49,5 +49,5 @@ def generate_inlier_mask(moving_vectors, map_size, thresh):
             for a_x in range_a_x:
                 for a_y in range_a_y:
                     mask[a_y, a_x, b_y, b_x] = 1
-    
+    '''
     return mask

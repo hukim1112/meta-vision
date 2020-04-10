@@ -26,10 +26,10 @@ def data_process(function, config):
     tps_random_rate = config['train']['tps_random_rate']
     pad_ratio = config['train']['pad_ratio']
     output_size = config['image_shape'][:2]
-    moving_vectors = (np.random.rand(9, 2) - 0.5) * 2 * tps_random_rate
     def wrapper(image):
-        return function(image, moving_vectors, pad_ratio, output_size)
+        return function(image, tps_random_rate, pad_ratio, output_size)
     return wrapper
 
-def use_py_function(image, moving_vectors, pad_ratio, output_size):
+def use_py_function(image, tps_random_rate, pad_ratio, output_size):
+    moving_vectors = (tf.random.uniform([9, 2]) - 0.5) * 2 * tps_random_rate
     return tf.py_function(make_synthesized_image_pair, [image, moving_vectors, pad_ratio, output_size], [tf.float32, tf.float32, tf.float32])
