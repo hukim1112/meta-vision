@@ -1,3 +1,4 @@
 opencv-python
 numpy
 matplotlib
+#apt-get install -y libsm6 libxext6 libxrender-dev
