@@ -18,7 +18,7 @@ class CNN_geo(tf.keras.Model):
         geo_parameters = self.geo_parameter_regressor(corr_scores)
         return geo_parameters, corr_scores
     def save(self, ckpt_path):
-        self.model.save_weights(ckpt_path)
+        self.save_weights(ckpt_path)
     def load(self, ckpt_path):
         self.call(tf.ones([1,64,64,3]), tf.ones([1,64,64,3]))
         self.load_weights(ckpt_path)
