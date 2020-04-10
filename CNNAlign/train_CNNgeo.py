@@ -63,6 +63,7 @@ def main():
         'checkpoints', config['model_name'], config['exp_desc'])
     log_dir = os.path.join('logs', config['model_name'], config['exp_desc'])
     saver = manage_checkpoint.Saver(ckpt_dir, config['ckpt']['save_type'], config['ckpt']['max_to_keep'])
+    summary_writer = tf.summary.create_file_writer(log_dir)
 
     for epoch in range(config['train']['epochs']):
         print("start of epoch {}".format(epoch + 1))

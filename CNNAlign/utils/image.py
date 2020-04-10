@@ -124,7 +124,7 @@ def denormalize_bbox(coord, shape):
     return x_min, y_min, x_max, y_max
 
 
-def make_synthesized_image_pair(image, moving_vectors, pad_ratio, output_size=(64, 64)):
+def make_synthesized_pair(image, moving_vectors, pad_ratio, output_size=(64, 64)):
     image = image.numpy()
     moving_vectors = moving_vectors.numpy()
     cropped_image, bbox = crop_image_randomly(image, output_size)
