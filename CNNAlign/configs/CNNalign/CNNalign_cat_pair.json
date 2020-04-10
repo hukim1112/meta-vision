@@ -1,7 +1,7 @@
 {
     "exp_desc" : "200410_cnnalign_cat_pair",
     "dataset_name" : "mini_imagenet",
-    "data_dir" : "/home/dan/prj/share_docker/datasets/mini_imagenet",
+    "data_dir" : "/home/files/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
     "model_name" : "CNNalign",
     "thresh" : 1.0,
@@ -9,7 +9,7 @@
     {
         "method" : "episodic_learning",
         "tps_random_rate" : null,
-        "pad_ratio" : null
+        "pad_ratio" : null,
     },
     "ckpt":
     {

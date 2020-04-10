@@ -1,10 +1,15 @@
 {
     "exp_desc" : "200410_best_cnngeo",
     "dataset_name" : "mini_imagenet",
-    "processing" : "random_TPS",
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
     "model_name" : "CNNgeo",
+    "data" :
+    {
+        "method" : "synthesized_pair",
+        "tps_random_rate" : 0.2,
+        "pad_ratio" : 0.2,
+    },
     "ckpt":
     {
         "save_type" : "best",
@@ -13,8 +18,6 @@
     "train":
     {        
         "n_examples" : -1,
-        "tps_random_rate" : 0.2,
-        "pad_ratio" : 0.2,
         "learning_rate" : 1e-5,
         "batch_size" : 128,
         "epochs" : 100
@@ -26,6 +29,7 @@
     },
     "test":
     {
-        "n_examples" : -1
+        "n_examples" : -1,
+        "batch_size" : 128
     }
 }

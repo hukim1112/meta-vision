@@ -1,7 +1,4 @@
-import tensorflow as tf
-import numpy as np
 from .mini_imagenet import load_mini_imagenet
-from utils.image import make_synthesized_pair
 
 
 def load_data(splits, config):
@@ -10,26 +7,4 @@ def load_data(splits, config):
     else:
         raise ValueError("Wrong dataset name : {}".format(
             config['dataset_name']))
-    if config['processing'] == 'synthesized_pair':
-        tf_func = wrapper_function(use_py_function, config)
-        for split in splits:
-            ds[split] = ds[split].map(tf_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    elif config['processing'] == 'same_categorical_pair':
-        for split in splits:
-            ds[split] = ds[split]
-    else:
-        raise ValueError("Wrong data processing type : {}".format(
-            config['processing']))
     return ds
-
-def wrapper_function(func, config):
-    tps_random_rate = config['train']['tps_random_rate']
-    pad_ratio = config['train']['pad_ratio']
-    output_size = config['image_shape'][:2]
-    def wrapper(image):
-        return func(image, tps_random_rate, pad_ratio, output_size)
-    return wrapper
-
-def use_py_function(image, tps_random_rate, pad_ratio, output_size):
-    moving_vectors = (tf.random.uniform([9, 2]) - 0.5) * 2 * tps_random_rate
-    return tf.py_function(make_synthesized_pair, [image, moving_vectors, pad_ratio, output_size], [tf.float32, tf.float32, tf.float32])

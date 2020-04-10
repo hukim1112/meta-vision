@@ -4,23 +4,29 @@ import numpy as np
 import math
 import geo_transform as tps
 
+
 class CNN_align(tf.keras.Model):
     def __init__(self, backbone_name, thresh=1.0):
         super(CNN_align, self).__init__()
         self.model_name = 'CNNalign'
         self.cnn_geo = CNN_geo(backbone_name)
         self.thresh = thresh
+
     def call(self, image_A, image_B):
         geo_parameters, corr_scores = self.cnn_geo(image_A, image_B)
         map_size = corr_scores.shape[-2:]
-        inlier_masks = tf.map_fn( lambda x : tf.py_function(generate_inlier_mask, [x, map_size, self.thresh], tf.float32) , geo_parameters)
+        inlier_masks = tf.map_fn(lambda x: tf.py_function(generate_inlier_mask, [
+                                 x, map_size, self.thresh], tf.float32), geo_parameters)
         inlier_matching = corr_scores * inlier_masks  # B, H, W, H, W
         return inlier_matching, tf.reduce_sum(inlier_matching, axis=(1, 2, 3, 4))
+
     def save(self, ckpt_path):
         self.cnn_geo.save(ckpt_path)
+
     def load(self, ckpt_path):
         self.cnn_geo.load(ckpt_path)
-        
+
+
 def generate_inlier_mask(moving_vectors, map_size, thresh):
     moving_vectors = np.reshape(moving_vectors.numpy(), (9, 2))
     height, width = map_size
@@ -33,7 +39,6 @@ def generate_inlier_mask(moving_vectors, map_size, thresh):
     grid = grid * (height - 1, width - 1)
     # coordinates of a_x, a_y, b_x, b_y from feature map A (a_x,a_y) and feature map B (b_x,b_y)
     mask = np.zeros([height, width, height, width])
-    '''
     for b_y in range(height):
         for b_x in range(width):
             # (a_x, a_y) of feature map A matched (b_x, b_y), coord of feature map B
@@ -49,5 +54,5 @@ def generate_inlier_mask(moving_vectors, map_size, thresh):
             for a_x in range_a_x:
                 for a_y in range_a_y:
                     mask[a_y, a_x, b_y, b_x] = 1
-    '''
+
     return mask
