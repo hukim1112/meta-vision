@@ -9,7 +9,7 @@
     {
         "method" : "episodic_learning",
         "tps_random_rate" : null,
-        "pad_ratio" : null,
+        "pad_ratio" : null
     },
     "ckpt":
     {

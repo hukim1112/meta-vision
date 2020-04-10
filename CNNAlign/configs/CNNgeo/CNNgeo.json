@@ -8,7 +8,7 @@
     {
         "method" : "synthesized_pair",
         "tps_random_rate" : 0.2,
-        "pad_ratio" : 0.2,
+        "pad_ratio" : 0.2
     },
     "ckpt":
     {
