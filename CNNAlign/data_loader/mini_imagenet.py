@@ -45,7 +45,7 @@ def load_mini_imagenet(splits, config):
 
 def get_dataset_of_synthesized_pair(split, data, config):
     data = np.reshape(data, [-1, 84, 84, 3])
-    np.random.shuffle(data)
+    #np.random.shuffle(data)
     data = data[:config[split]['n_examples']]
     n_examples = len(data)
     print("{} dataset amount : {}".format(split, n_examples))

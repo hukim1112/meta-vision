@@ -74,7 +74,7 @@ def main():
             t_loss = train_step(
                 image_a, image_b, label, model, optimizer)
             train_loss(t_loss)
-            if step % 20 == 0:
+            if step % 1 == 0:
                 print('Training loss (for one batch) at step {}: {}'.format(
                     step, t_loss.numpy()))
         for image_a, image_b, label in val_ds:
