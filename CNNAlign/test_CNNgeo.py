@@ -16,18 +16,20 @@ def visualize(image_A, image_B, image_C, batch_size):
     fig = plt.figure()
     fig_axis = []
     col = batch_size
-    row = num_images//col
-    
+    row = num_images // col
+
     for i in range(num_images):
-        fig_axis.append(fig.add_subplot(row, col,i+1))
+        fig_axis.append(fig.add_subplot(row, col, i + 1))
         fig_axis[i].imshow(images[i])
     plt.show()
 
+
 def data_test_module(image_A, image_B, parameters):
     batch_size = parameters.shape[0]
-    image_C = np.array(list(map(lambda x : image.synthesize_image(x[0], x[1], (64,64), bbox=None, pad_ratio=None)
-    ,zip(image_A.copy(), parameters.copy()))))
+    image_C = np.array(list(map(lambda x: image.synthesize_image(
+        x[0], x[1], (64, 64), bbox=None, pad_ratio=None), zip(image_A.copy(), parameters.copy()))))
     visualize(image_A, image_B, image_C, batch_size)
+
 
 def data_test():
     with open("configs/CNNgeo/overfit.json") as file:
@@ -61,6 +63,7 @@ def model_test():
 
         print(pred, parameters)
 
+
 def model_training_test_module(image_A, image_B, parameters, model):
     batch_size = parameters.shape[0]
     preds, _ = model(image_A, image_B)
@@ -70,10 +73,11 @@ def model_training_test_module(image_A, image_B, parameters, model):
     for i, j in zip(parameters, preds):
         print("parameters : {}, pred : {}".format(i, j))
 
-    image_C = np.array(list(map(lambda x : image.synthesize_image(x[0], x[1], (64,64), bbox=None, pad_ratio=None)
-    ,zip(image_A.copy(), preds.copy()))))
+    image_C = np.array(list(map(lambda x: image.synthesize_image(
+        x[0], x[1], (64, 64), bbox=None, pad_ratio=None), zip(image_A.copy(), preds.copy()))))
     #image_C = np.array([img  for (img, p) in _list])
     visualize(image_A, image_B, image_C, batch_size)
+
 
 def model_training_test():
     with open("configs/CNNgeo/overfit.json") as file:
@@ -92,6 +96,7 @@ def model_training_test():
         image_B = image_B.numpy()
         parameters = parameters.numpy()
     model_training_test_module(image_A, image_B, parameters, model)
+
 
 if __name__ == "__main__":
     model_training_test()
