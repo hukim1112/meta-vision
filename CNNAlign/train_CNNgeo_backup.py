@@ -62,8 +62,7 @@ def main():
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])
     log_dir = os.path.join('logs', config['model_name'], config['exp_desc'])
-    saver = manage_checkpoint.Saver(
-        ckpt_dir, config['ckpt']['save_type'], config['ckpt']['max_to_keep'])
+    saver = manage_checkpoint.Saver(ckpt_dir, config['ckpt']['save_type'], config['ckpt']['max_to_keep'])
     summary_writer = tf.summary.create_file_writer(log_dir)
 
     for epoch in range(config['train']['epochs']):
@@ -75,11 +74,11 @@ def main():
             if step % 20 == 0:
                 print('Training loss (for one batch) at step {}: {}'.format(
                     step, t_loss.numpy()))
-        # for image_a, image_b, label in val_ds:
-        #     pred, v_loss = val_step(image_a, image_b, label, model)
-        #     val_loss(v_loss)
-        # template = 'Epoch {}, Loss: {}, Val Loss: {}'
-        # print(template.format(epoch + 1, train_loss.result(), val_loss.result()))
+        for image_a, image_b, label in val_ds:
+            pred, v_loss = val_step(image_a, image_b, label, model)
+            val_loss(v_loss)
+        template = 'Epoch {}, Loss: {}, Val Loss: {}'
+        print(template.format(epoch + 1, train_loss.result(), val_loss.result()))
         print("end of epoch.")
         with summary_writer.as_default():
             tf.summary.scalar(
@@ -87,12 +86,11 @@ def main():
             tf.summary.scalar('val_loss', val_loss.result(), step=epoch + 1)
             summary_writer.flush()
         # Save your model
-        saver.save_or_not(model, epoch + 1, train_loss.result())
+        saver.save_or_not(model, epoch + 1, val_loss.result())
         train_loss.reset_states()
         val_loss.reset_states()
     print("Checkpoint directory : ", ckpt_dir)
     print("Tensorboard log directory : ", log_dir)
-
 
 if __name__ == '__main__':
     main()

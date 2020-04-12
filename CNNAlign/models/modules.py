@@ -49,6 +49,8 @@ class Correlation_network(tf.keras.layers.Layer):
         return tf.math.divide(corr_score, ambiguous_match_penalty)
         # see eq (2) in "End-to-end weakly-supervised semantic alignment"
 
+
+'''
 class Spatial_transformer_regressor(tf.keras.layers.Layer):
     def __init__(self, num_param):
         super(Spatial_transformer_regressor, self).__init__()
@@ -63,8 +65,11 @@ class Spatial_transformer_regressor(tf.keras.layers.Layer):
 
     def call(self, correlation):
         return self.regressor(correlation)
+
 '''
-class Spatial_transformer_regressor1(tf.keras.layers.Layer):
+
+
+class Spatial_transformer_regressor(tf.keras.layers.Layer):
     def __init__(self, num_param):
         super(Spatial_transformer_regressor, self).__init__()
         self.regressor = tf.keras.Sequential([
@@ -72,7 +77,7 @@ class Spatial_transformer_regressor1(tf.keras.layers.Layer):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Conv3D(64, (5, 5, 5), activation='relu'),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Conv3D(32, (3, 3, 3), activation='relu'),
+            tf.keras.layers.Conv3D(64, (3, 3, 3), activation='relu'),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(num_param),
@@ -80,4 +85,3 @@ class Spatial_transformer_regressor1(tf.keras.layers.Layer):
 
     def call(self, correlation):
         return self.regressor(correlation)
-'''
