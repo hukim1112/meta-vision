@@ -25,9 +25,8 @@ def visualize(image_A, image_B, image_C, batch_size):
 
 def data_test_module(image_A, image_B, parameters):
     batch_size = parameters.shape[0]
-    _list = list(map(lambda x : image.synthesize_image(x[0], x[1], (64,64), bbox=None, pad_ratio=None)
-    ,zip(image_A.copy(), parameters.copy())))
-    image_C = np.array([img  for (img, p) in _list])
+    image_C = np.array(list(map(lambda x : image.synthesize_image(x[0], x[1], (64,64), bbox=None, pad_ratio=None)
+    ,zip(image_A.copy(), parameters.copy()))))
     visualize(image_A, image_B, image_C, batch_size)
 
 def data_test():
@@ -43,33 +42,56 @@ def data_test():
     data_test_module(image_A, image_B, parameters)
 
 
-def model_test_module(image_A, image_B, parameters, model):
-    batch_size = parameters.shape[0]
-    preds = model(image_A, image_B).numpy()
-
-    print("Comparison parameters and pred")
-    for i, j in parameters, preds:
-        print("parameters : {}, pred : {}".format(i, j))
-
-    _list = list(map(lambda x : image.synthesize_image(x[0], x[1], (64,64), bbox=None, pad_ratio=None)
-    ,zip(image_A.copy(), preds.copy())))
-    image_C = np.array([img  for (img, p) in _list])
-    visualize(image_A, image_B, image_C, batch_size)
-
-def model_test()
+def model_test():
     with open("configs/CNNgeo/overfit.json") as file:
         config = json.load(file)
     splits = ['train', 'val']
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(4)
 
+    ckpt = 'checkpoints/CNNgeo/200412_cnngeo_overfit/CNNgeo-155.h5'
+
     model = CNN_geo("prototypical_network")
-    model.load(config['ckpt']['trained_cnngeo'])
+    model.load(ckpt)
+
+    for image_A, image_B, parameters in train_ds.take(1):
+        pred, _ = model(image_A, image_B)
+        pred = pred.numpy()
+        parameters = tf.reshape(parameters, [-1, 18]).numpy()
+
+        print(pred, parameters)
+
+def model_training_test_module(image_A, image_B, parameters, model):
+    batch_size = parameters.shape[0]
+    preds, _ = model(image_A, image_B)
+    preds = tf.reshape(preds, [-1, 9, 2]).numpy()
+
+    print("Comparison parameters and pred")
+    for i, j in zip(parameters, preds):
+        print("parameters : {}, pred : {}".format(i, j))
+
+    image_C = np.array(list(map(lambda x : image.synthesize_image(x[0], x[1], (64,64), bbox=None, pad_ratio=None)
+    ,zip(image_A.copy(), preds.copy()))))
+    #image_C = np.array([img  for (img, p) in _list])
+    visualize(image_A, image_B, image_C, batch_size)
+
+def model_training_test():
+    with open("configs/CNNgeo/overfit.json") as file:
+        config = json.load(file)
+    splits = ['train', 'val']
+    datasets = load_data(splits, config)
+    train_ds = datasets['train'].batch(4)
+
+    ckpt = 'checkpoints/CNNgeo/200412_cnngeo_overfit/CNNgeo-155.h5'
+
+    model = CNN_geo("prototypical_network")
+    model.load(ckpt)
 
     for image_A, image_B, parameters in train_ds.take(1):
         image_A = image_A.numpy()
         image_B = image_B.numpy()
         parameters = parameters.numpy()
-    data_test_module(image_A, image_B, parameters, model)
+    model_training_test_module(image_A, image_B, parameters, model)
+
 if __name__ == "__main__":
-    data_pipeline_test()
+    model_training_test()

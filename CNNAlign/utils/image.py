@@ -101,7 +101,7 @@ def synthesize_image(image, moving_vectors, output_size, bbox=None, pad_ratio=No
     if warped_image.shape[0] < y_min + output_size[0] or warped_image.shape[1] < x_min + output_size[1]:
         raise ValueError("Index {} is out of bound of image shape {}".format((y_min + output_size[0], x_min + output_size[1]),
                                                                              warped_image.shape))
-    return warped_image[y_min:y_min + output_size[0], x_min:x_min + output_size[1]], moving_vectors
+    return warped_image[y_min:y_min + output_size[0], x_min:x_min + output_size[1]]
 
 
 def normalize_bbox(coord, shape):
@@ -128,6 +128,6 @@ def make_synthesized_pair(image, moving_vectors, pad_ratio, output_size=(64, 64)
     image = image.numpy()
     moving_vectors = moving_vectors.numpy()
     cropped_image, bbox = crop_image_randomly(image, output_size)
-    warped_image, _ = synthesize_image(
+    warped_image = synthesize_image(
         image.copy(), moving_vectors.copy(), output_size, bbox, pad_ratio)
     return cropped_image, warped_image, moving_vectors
