@@ -32,7 +32,7 @@ def data_test_module(image_A, image_B, parameters):
 
 
 def data_test():
-    with open("configs/CNNgeo/overfit.json") as file:
+    with open("configs/CNNgeo/overfit_test.json") as file:
         config = json.load(file)
     splits = ['train', 'val']
     datasets = load_data(splits, config)
@@ -51,7 +51,7 @@ def model_test():
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(4)
 
-    ckpt = 'checkpoints/CNNgeo/200412_cnngeo_overfit/CNNgeo-155.h5'
+    ckpt = 'checkpoints/CNNgeo/200412_cnngeo_overfit/CNNgeo-984.h5'
 
     model = CNN_geo("prototypical_network")
     model.load(ckpt)
@@ -86,7 +86,7 @@ def model_training_test():
     datasets = load_data(splits, config)
     train_ds = datasets['train'].batch(4)
 
-    ckpt = 'checkpoints/CNNgeo/200411_cnngeo_overfit/CNNgeo-984.h5'
+    ckpt = 'checkpoints/CNNgeo/200411_cnngeo_overfit/CNNgeo-340.h5'
 
     model = CNN_geo("prototypical_network")
     model.load(ckpt)
