@@ -10,7 +10,7 @@ def test_train(config):
     train.overfit(config, ['train'])
     #train.result_test(config, ['train'])
 
-def model_test(config):
+def test_model(config):
     model.output(config, ['train'])
 
 if __name__ == "__main__":
@@ -24,6 +24,6 @@ if __name__ == "__main__":
     config = args.config
     with open(config) as fp:
         config = json.load(fp)
-    model_test(config)
-    #test_train(config)
+    #test_model(config)
+    test_train(config)
     #test_data(config)

@@ -23,7 +23,7 @@ def loss_fn(pred, label):
 def train_step(image_A, image_B, label, model, optimizer):
     with tf.GradientTape() as tape:
         pred, _ = model(image_A, image_B)
-        loss = loss_fn(pred, tf.reshape(label, [-1, 18]))
+        loss = loss_fn(pred, label)
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     return pred, loss
@@ -32,7 +32,7 @@ def train_step(image_A, image_B, label, model, optimizer):
 @tf.function
 def val_step(image_A, image_B, label, model):
     pred, _ = model(image_A, image_B)
-    loss = loss_fn(pred, tf.reshape(label, [-1, 18]))
+    loss = loss_fn(pred, label)
     return pred, loss
 
 def train(config):
