@@ -21,9 +21,9 @@ class Saver():
         queue.append({'epoch': epoch, 'loss': loss})
         if queue_size is not None:
             if len(queue) > queue_size:
-                print("queue length"len(queue))
+                print("queue length : ", len(queue))
                 item = queue.pop(0)
-                print(item)
+                print("popped item : ", item)
                 return item['epoch']
         return None
 
