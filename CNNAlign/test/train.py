@@ -8,7 +8,9 @@ from CNNgeo import train
 import tensorflow as tf
 
 def overfit(config, splits):
-    #train(config) # mode is overfitted.
+    train(config) # mode is overfitted.
+
+def result_test(config, split):
     model = CNN_geo("prototypical_network")
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])
@@ -30,7 +32,7 @@ def overfit(config, splits):
     image_C = list(map(lambda x : image.synthesize_image(x[0], x[1], (64, 64), bbox=None, pad_ratio=None),
                    zip(image_A.copy(), pred.copy())))    
     image_C = np.array(image_C)
-    visualize.show_image([image_A, image_B, image_C])
+    visualize.show_image([image_A, image_B, image_C])    
 
 if __name__ == "__main__":
-    test_train()
+    pass

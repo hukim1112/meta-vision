@@ -10,6 +10,7 @@ def test_data():
 def test_train():
     with open("overfit.json") as fp:
         config = json.load(fp)
-    ckpt = train.overfit(config, ['train'])
+    train.overfit(config, ['train'])
+    #train.result_test(config, ['train'])
 if __name__ == "__main__":
     test_train()
