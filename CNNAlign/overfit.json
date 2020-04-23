@@ -1,5 +1,5 @@
 {
-    "exp_desc" : "200411_cnngeo_overfit",
+    "exp_desc" : "200423_cnngeo_overfit",
     "dataset_name" : "mini_imagenet",
     "data_dir" : "/home/dan/prj/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],

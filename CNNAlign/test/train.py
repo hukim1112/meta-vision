@@ -1,16 +1,36 @@
 import numpy as np
+import os
 from data_loader import load_data
 from models.cnn_geo import CNN_geo
 from utils import image
 from . import visualize
 from CNNgeo import train
+import tensorflow as tf
 
 def overfit(config, splits):
-    datasets = load_data(splits, config)
-    train(config)
+    #train(config) # mode is overfitted.
     model = CNN_geo("prototypical_network")
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])
-    ckpt = os.path.join(ckpt_dir, "CNNgeo-100.h5")
+    ckpt = os.path.join(ckpt_dir, "{}-{}.h5".format(config['model_name'], str(config['train']['epochs'])))
     model.load(ckpt)
-    print(model.get_weight())
+    datasets = load_data(splits, config)
+    ds = datasets['train'].batch(1)
+    for image_A, image_B, parameters in ds.take(1):
+        image_A = image_A.numpy()
+        image_B = image_B.numpy()
+        parameters = parameters.numpy()
+    pred, _ = model(image_A, image_B)
+    pred = tf.reshape(pred, [-1, 9, 2])
+    print("compare gt : {} and pred : {}".format(parameters, pred))
+    loss = tf.reduce_sum(tf.keras.losses.MSE(pred, parameters), axis=1)
+    print("loss : {}".format(loss))
+
+    pred = pred.numpy()
+    image_C = list(map(lambda x : image.synthesize_image(x[0], x[1], (64, 64), bbox=None, pad_ratio=None),
+                   zip(image_A.copy(), pred.copy())))    
+    image_C = np.array(image_C)
+    visualize.show_image([image_A, image_B, image_C])
+
+if __name__ == "__main__":
+    test_train()
