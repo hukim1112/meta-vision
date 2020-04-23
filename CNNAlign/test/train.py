@@ -24,7 +24,6 @@ def result_test(config, splits):
         image_B = image_B.numpy()
         parameters = parameters.numpy()
     pred, _ = model(image_A, image_B)
-    pred = tf.reshape(pred, [-1, 9, 2])
     print("compare gt : {} and pred : {}".format(parameters, pred))
     loss = tf.reduce_sum(tf.keras.losses.MSE(pred, parameters), axis=1)
     print("loss : {}".format(loss))

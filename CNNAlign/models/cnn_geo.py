@@ -16,6 +16,7 @@ class CNN_geo(tf.keras.Model):
         feature_B = self.feature_extractor.channelwise_l2_normalize(feature_B)
         corr_scores = self.correlation_network(feature_A, feature_B)
         geo_parameters = self.geo_parameter_regressor(corr_scores)
+        geo_parameters = tf.reshape(geo_parameters, [-1, 9, 2]
         return geo_parameters, corr_scores
     def save(self, ckpt_path):
         self.save_weights(ckpt_path)

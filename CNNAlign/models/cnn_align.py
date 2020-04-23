@@ -28,7 +28,7 @@ class CNN_align(tf.keras.Model):
 
 
 def generate_inlier_mask(moving_vectors, map_size, thresh):
-    moving_vectors = np.reshape(moving_vectors.numpy(), (9, 2))
+    moving_vectors = moving_vectors.numpy()
     height, width = map_size
     src_points = np.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
                            [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
