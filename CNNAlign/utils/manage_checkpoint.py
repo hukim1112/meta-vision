@@ -19,12 +19,9 @@ class Saver():
 
     def _queue(self, queue, epoch, loss, queue_size):
         queue.append({'epoch': epoch, 'loss': loss})
-        print("queue_size : ", queue_size)
         if queue_size is not None:
             if len(queue) > queue_size:
-                print("queue length : ", len(queue))
                 item = queue.pop(0)
-                print("popped item : ", item)
                 return item['epoch']
         return None
 
@@ -69,7 +66,6 @@ class Saver():
     def delete(self, model, epoch):
         path = os.path.join(
             self.ckpt_dir, "{}-{}.h5".format(model.model_name, epoch))
-        print(path)
         if os.path.isfile(path):
             os.remove(path)
         return

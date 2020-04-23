@@ -12,12 +12,11 @@ os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 
 def loss_fn(pred, label):
-    pred = tf.pow(pred-label, 2)
-    pred = tf.keras.losses.MSE(pred, label)
-    loss1 = tf.reduce_sum(tf.keras.losses.MSE(pred, label))
-    loss2 = tf.reduce_mean(tf.keras.losses.MSE(pred, label))
-    tf.print("pred : ", pred, "reduce_sum: ", loss1, "reduce_mean: ", loss2, output_stream=sys.stdout)
-    return loss1
+    loss = tf.sqrt(tf.reduce_sum(tf.pow(pred-label, 2), axis=[-1,-2]))
+    loss_mean = tf.reduce_mean(loss)
+    loss_sum = tf.reduce_sum(loss)
+    tf.print("pred : ", pred, "reduce_sum: ", loss_sum, "reduce_mean: ", loss_mean, output_stream=sys.stdout)
+    return loss_sum
 
 
 @tf.function

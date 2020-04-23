@@ -11,7 +11,6 @@ def overfit(config, splits):
     train(config) # mode is overfitted.
 
 def result_test(config, splits):
-    print(config['train']['epochs'])
     model = CNN_geo("prototypical_network")
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])

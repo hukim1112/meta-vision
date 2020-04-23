@@ -1,4 +1,4 @@
-from test import data, train
+from test import data, train, model
 import json, os
 import argparse
 
@@ -9,6 +9,10 @@ def test_data(config):
 def test_train(config):
     train.overfit(config, ['train'])
     #train.result_test(config, ['train'])
+
+def model_test(config):
+    model.output(config, ['train'])
+
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description=__doc__)
     argparser.add_argument(
@@ -20,6 +24,6 @@ if __name__ == "__main__":
     config = args.config
     with open(config) as fp:
         config = json.load(fp)
-    print(config)
-    test_train(config)
+    model_test(config)
+    #test_train(config)
     #test_data(config)
