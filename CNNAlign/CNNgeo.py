@@ -1,4 +1,4 @@
-import os
+import os, sys
 import json
 import argparse
 from data_loader import load_data
@@ -53,7 +53,7 @@ def train(config):
         'checkpoints', config['model_name'], config['exp_desc'])
     log_dir = os.path.join('logs', config['model_name'], config['exp_desc'])
     saver = manage_checkpoint.Saver(
-        ckpt_dir, config['ckpt']['save_type'], config['ckpt']['max_to_keep'])
+        ckpt_dir, save_type=config['ckpt']['save_type'], max_to_keep=config['ckpt']['max_to_keep'])
     summary_writer = tf.summary.create_file_writer(log_dir)
 
     for epoch in range(config['train']['epochs']):
