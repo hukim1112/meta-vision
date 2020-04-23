@@ -48,7 +48,7 @@ class Saver():
                 self.save(model, epoch)
                 self.minimum = epoch
                 for i in [item['epoch'] for item in self.interval_queue[:-2]]:
-                    self.delete(i)  # if there exists
+                    self.delete(model, i)  # if there exists
             elif self.interval_queue[0]['epoch'] == self.minimum:
                 # then the first model in interval_queue is a local minimum
                 item = self.interval_queue[0]
@@ -57,15 +57,36 @@ class Saver():
                 epoch_to_delete = self._queue(
                     self.eval_queue, lm_epoch, lm_loss, self.max_to_keep)
         if epoch_to_delete is not None:
-            self.delete(epoch_to_delete)
+            self.delete(model, epoch_to_delete)
 
     def save(self, model, epoch):
         model.save(os.path.join(self.ckpt_dir,
                                 "{}-{}.h5".format(model.model_name, epoch)))
 
-    def delete(self, epoch):
+    def delete(self, model, epoch):
         path = os.path.join(
             self.ckpt_dir, "{}-{}.h5".format(model.model_name, epoch))
         if os.path.isfile(path):
             os.remove(path)
         return
+
+class dummy_model():
+    def __init__(self):
+        self.model_name = 'dummy'
+    def save(self, path):
+        pass
+    def load(self, path):
+        pass
+
+def main():
+    ckpt ="sss"
+    saver = Saver(ckpt, save_type='local_minimum', interval=1, max_to_keep=3)
+    model = dummy_model()
+
+    val_loss = [10, 9, 8, 100, 20, 30, 7, 6, 50, 4, 30, 2, 1]
+    for i, val in enumerate(val_loss):
+        saver.save_or_not(model, i+1, val)
+
+
+if __name__ == "__main__":
+    main()
