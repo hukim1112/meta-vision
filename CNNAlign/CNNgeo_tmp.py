@@ -99,4 +99,4 @@ def model_training_test():
 
 
 if __name__ == "__main__":
-    model_training_test()
+    data_test()

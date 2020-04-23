@@ -1,7 +1,7 @@
 {
     "exp_desc" : "200411_cnngeo_overfit",
     "dataset_name" : "mini_imagenet",
-    "data_dir" : "/home/files/datasets/mini_imagenet",
+    "data_dir" : "/home/dan/prj/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
     "model_name" : "CNNgeo",
     "data" :
@@ -12,20 +12,21 @@
     },
     "ckpt":
     {
-        "save_type" : "best",
-        "max_to_keep" : 3
+        "save_type" : "latest",
+        "max_to_keep" : 5
     },
     "train":
     {        
-        "n_examples" : 10,
+        "n_examples" : 1,
         "learning_rate" : 0.01,
-        "batch_size" : 5,
-        "epochs" : 2000
+        "batch_size" : 1,
+        "epochs" : 100,
+        "print_step" : 1
     },
     "val":
     {
-        "n_examples" : 4,
-        "batch_size" : 4
+        "n_examples" : 1,
+        "batch_size" : 1
     },
     "test":
     {

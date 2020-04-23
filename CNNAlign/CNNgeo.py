@@ -3,7 +3,6 @@ import json
 import argparse
 from data_loader import load_data
 from models.cnn_geo import CNN_geo
-
 from matplotlib import pyplot as plt
 import tensorflow as tf
 import cv2
@@ -32,19 +31,7 @@ def val_step(image_A, image_B, label, model):
     loss = loss_fn(pred, tf.reshape(label, [-1, 18]))
     return pred, loss
 
-
-def main():
-    argparser = argparse.ArgumentParser(description=__doc__)
-    argparser.add_argument(
-        '-c', '--config',
-        metavar='C',
-        default='None',
-        help='The Configuration file')
-    args = argparser.parse_args()
-    config = args.config
-    with open(config) as file:
-        config = json.load(file)
-
+def train(config):
     batch_size = config['train']['batch_size']
     splits = ['train', 'val']
     datasets = load_data(splits, config)
@@ -72,7 +59,7 @@ def main():
             pred, t_loss = train_step(
                 image_a, image_b, label, model, optimizer)
             train_loss(t_loss)
-            if step % 20 == 0:
+            if step % config['train']['print_step'] == 0:
                 print('Training loss (for one batch) at step {}: {}'.format(
                     step, t_loss.numpy()))
         for image_a, image_b, label in val_ds:
@@ -93,6 +80,15 @@ def main():
     print("Checkpoint directory : ", ckpt_dir)
     print("Tensorboard log directory : ", log_dir)
 
-
 if __name__ == '__main__':
-    main()
+    argparser = argparse.ArgumentParser(description=__doc__)
+    argparser.add_argument(
+        '-c', '--config',
+        metavar='C',
+        default='None',
+        help='The Configuration file')
+    args = argparser.parse_args()
+    config = args.config
+    with open(config) as file:
+        config = json.load(file)
+    train(config)
