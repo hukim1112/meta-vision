@@ -66,6 +66,7 @@ class Saver():
     def delete(self, model, epoch):
         path = os.path.join(
             self.ckpt_dir, "{}-{}.h5".format(model.model_name, epoch))
+        print(path)
         if os.path.isfile(path):
             os.remove(path)
         return

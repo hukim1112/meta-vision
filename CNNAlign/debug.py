@@ -7,8 +7,8 @@ def test_data(config):
     data.synthesize_image_pair(config, splits)
 
 def test_train(config):
-    #train.overfit(config, ['train'])
-    train.result_test(config, ['train'])
+    train.overfit(config, ['train'])
+    #train.result_test(config, ['train'])
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description=__doc__)
     argparser.add_argument(

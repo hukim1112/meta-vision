@@ -12,7 +12,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 
 def loss_fn(pred, label):
-    return tf.reduce_mean(tf.keras.losses.MSE(pred, label))
+    return tf.reduce_sum(tf.keras.losses.MSE(pred, label))
 
 
 @tf.function
