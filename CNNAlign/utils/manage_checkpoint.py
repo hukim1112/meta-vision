@@ -21,7 +21,9 @@ class Saver():
         queue.append({'epoch': epoch, 'loss': loss})
         if queue_size is not None:
             if len(queue) > queue_size:
+                print("queue length"len(queue))
                 item = queue.pop(0)
+                print(item)
                 return item['epoch']
         return None
 
@@ -58,7 +60,7 @@ class Saver():
                     self.eval_queue, lm_epoch, lm_loss, self.max_to_keep)
         if epoch_to_delete is not None:
             self.delete(model, epoch_to_delete)
-        print(self.eval_queue)
+
     def save(self, model, epoch):
         model.save(os.path.join(self.ckpt_dir,
                                 "{}-{}.h5".format(model.model_name, epoch)))
