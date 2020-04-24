@@ -1,5 +1,5 @@
 {
-    "exp_desc" : "200413_best_cnngeo",
+    "exp_desc" : "200424_best_cnngeo",
     "dataset_name" : "mini_imagenet",
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
@@ -21,7 +21,7 @@
         "learning_rate" : 1e-5,
         "batch_size" : 128,
         "epochs" : 100,
-        "print_step" : 20,
+        "print_step" : 20
     },
     "val":
     {
