@@ -6,6 +6,7 @@ from utils import image
 from . import visualize
 from CNNgeo import train
 import tensorflow as tf
+import numpy as np
 
 def overfit(config, splits):
     train(config) # mode is overfitted.
@@ -31,7 +32,7 @@ def result_test(config, splits):
     image_C = list(map(lambda x : image.synthesize_image(x[0], x[1], (64, 64), bbox=None, pad_ratio=None),
                    zip(image_A.copy(), pred.copy())))    
     image_C = np.array(image_C)
-    visualize.show_image([image_A, image_B, image_C])    
+    visualize.show_TPS_image([image_A, image_B, image_C], [np.ones_like(parameters), parameters, pred])    
 
 if __name__ == "__main__":
     pass
