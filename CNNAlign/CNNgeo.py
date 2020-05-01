@@ -22,12 +22,15 @@ def loss_fn(pred, label):
 @tf.function
 def train_step(image_A, image_B, label, model, optimizer):
     with tf.GradientTape() as tape:
-        pred, _ = model(image_A, image_B)
+        pred, score = model(image_A, image_B)
         loss = loss_fn(pred, label)
-    tf.print("score std : ", tf.reduce_std(_), sys.stdout)
+    
+    score_std = tf.math.reduce_std(score)
+    tf.print("score : ", score[0,0,0,:8,:8])
+    tf.print("score std : ", score_std, sys.stdout)
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-    return pred, loss
+    return pred, loss, score_std
 
 
 @tf.function
@@ -61,7 +64,7 @@ def train(config):
     for epoch in range(config['train']['epochs']):
         print("start of epoch {}".format(epoch + 1))
         for step, (image_a, image_b, label) in enumerate(train_ds):
-            pred, t_loss = train_step(
+            pred, t_loss, score_std = train_step(
                 image_a, image_b, label, model, optimizer)
             train_loss(t_loss)
 
@@ -80,6 +83,7 @@ def train(config):
             tf.summary.scalar(
                 'train_loss', train_loss.result(), step=epoch + 1)
             tf.summary.scalar('val_loss', val_loss.result(), step=epoch + 1)
+            tf.summary.scalar('score std', score_std.result(), step=epoch+1)
             summary_writer.flush()
         # Save your model
         saver.save_or_not(model, epoch + 1, val_loss.result())

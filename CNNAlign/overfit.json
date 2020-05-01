@@ -1,5 +1,5 @@
 {
-    "exp_desc" : "200423_cnngeo_overfit",
+    "exp_desc" : "200501_exp1_learning_rate_is_matter",
     "dataset_name" : "mini_imagenet",
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
@@ -13,14 +13,14 @@
     "ckpt":
     {
         "save_type" : "latest",
-        "max_to_keep" : 5
+        "max_to_keep" : 100
     },
     "train":
     {        
         "n_examples" : 1,
-        "learning_rate" : 0.01,
+        "learning_rate" : 0.001,
         "batch_size" : 1,
-        "epochs" : 2000,
+        "epochs" : 100,
         "print_step" : 1
     },
     "val":
