@@ -24,6 +24,7 @@ def train_step(image_A, image_B, label, model, optimizer):
     with tf.GradientTape() as tape:
         pred, _ = model(image_A, image_B)
         loss = loss_fn(pred, label)
+    tf.print("score : ", _[0,0,0], sys.stdout)
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     return pred, loss
@@ -63,6 +64,9 @@ def train(config):
             pred, t_loss = train_step(
                 image_a, image_b, label, model, optimizer)
             train_loss(t_loss)
+
+            tf.print("pred : ", pred, "label : ", label, sys.stdout)
+
             if step % config['train']['print_step'] == 0:
                 print('Training loss (for one batch) at step {}: {}'.format(
                     step, t_loss.numpy()))

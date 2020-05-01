@@ -18,9 +18,9 @@
     "train":
     {        
         "n_examples" : 1,
-        "learning_rate" : 0.01,
+        "learning_rate" : 0.005,
         "batch_size" : 1,
-        "epochs" : 20,
+        "epochs" : 100,
         "print_step" : 1
     },
     "val":

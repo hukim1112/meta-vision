@@ -44,11 +44,13 @@ class Correlation_network(tf.keras.layers.Layer):
         feature_B = feature_B[:, tf.newaxis, tf.newaxis, :, :, :]
         # correlation score has tensor shape as [batch, HA, WA, HB, WB]
         corr_score = tf.reduce_mean(tf.multiply(feature_A, feature_B), axis=-1)
+        '''
         ambiguous_match_penalty = tf.math.sqrt(
             tf.reduce_sum(tf.pow(corr_score, 2), axis=[1, 2], keepdims=True))
         return tf.math.divide(corr_score, ambiguous_match_penalty)
         # see eq (2) in "End-to-end weakly-supervised semantic alignment"
-
+        '''
+        return corr_score
 
 '''
 class Spatial_transformer_regressor(tf.keras.layers.Layer):

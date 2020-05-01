@@ -16,7 +16,7 @@ def result_test(config, splits):
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])
     ckpt = os.path.join(ckpt_dir, "{}-{}.h5".format(config['model_name'], str(config['train']['epochs'])))
-    #model.load(ckpt)
+    model.load(ckpt)
     datasets = load_data(splits, config)
     ds = datasets['train'].batch(1)
     for image_A, image_B, parameters in ds.take(1):
@@ -27,6 +27,7 @@ def result_test(config, splits):
     pred, score = model(image_A, image_B)
     #print(score.shape)
     print("compare gt : {} and pred : {}".format(parameters, pred))
+    print("score : {}".format(score[0,0,0]))
     loss = tf.reduce_sum(tf.keras.losses.MSE(pred, parameters), axis=1)
     print("loss : {}".format(loss))
 
