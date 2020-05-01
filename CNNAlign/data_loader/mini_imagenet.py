@@ -37,6 +37,8 @@ def load_mini_imagenet(splits, config):
             ds[split] = get_dataset_of_synthesized_pair(split, data, config)
         elif config['data']['method'] == 'episodic_learning':
             ds[split] = get_dataset_of_episodes(split, data, config)
+        elif config['data']['method'] == 'classification' :
+            ds[split] = get_dataset_of_classification(split, data, config)
         else:
             raise ValueError("Wrong data processing type : {}".format(
                 config['processing']))
@@ -97,3 +99,7 @@ def get_dataset_of_episodes(split, data, config):
     data = data.map(transform_data)
 
     return data
+
+def get_dataset_of_classification(split, data, config):
+    return data
+

@@ -13,7 +13,7 @@
     "ckpt":
     {
         "save_type" : "latest",
-        "max_to_keep" : 5
+        "max_to_keep" : 100
     },
     "train":
     {        
