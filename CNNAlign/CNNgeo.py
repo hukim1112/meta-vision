@@ -83,7 +83,7 @@ def train(config):
             tf.summary.scalar(
                 'train_loss', train_loss.result(), step=epoch + 1)
             tf.summary.scalar('val_loss', val_loss.result(), step=epoch + 1)
-            tf.summary.scalar('score std', score_std.result(), step=epoch+1)
+            tf.summary.scalar('score std', score_std, step=epoch+1)
             summary_writer.flush()
         # Save your model
         saver.save_or_not(model, epoch + 1, val_loss.result())
