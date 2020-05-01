@@ -16,16 +16,17 @@ def result_test(config, splits):
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])
     ckpt = os.path.join(ckpt_dir, "{}-{}.h5".format(config['model_name'], str(config['train']['epochs'])))
-    model.load(ckpt)
+    #model.load(ckpt)
     datasets = load_data(splits, config)
     ds = datasets['train'].batch(1)
     for image_A, image_B, parameters in ds.take(1):
         image_A = image_A.numpy()
         image_B = image_B.numpy()
         parameters = parameters.numpy()
+    #image_B_hat = np.ones([1, 64, 64, 3])
     pred, score = model(image_A, image_B)
-    print(score.shape)
-    print("compare gt : {} and pred : {} score : {}".format(parameters, pred, score[0, 7, 7]))
+    #print(score.shape)
+    print("compare gt : {} and pred : {}".format(parameters, pred))
     loss = tf.reduce_sum(tf.keras.losses.MSE(pred, parameters), axis=1)
     print("loss : {}".format(loss))
 

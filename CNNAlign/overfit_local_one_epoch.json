@@ -1,5 +1,5 @@
 {
-    "exp_desc" : "200423_cnngeo_overfit_one_epoch",
+    "exp_desc" : "200501_cnngeo_overfit_one_epoch",
     "dataset_name" : "mini_imagenet",
     "data_dir" : "/home/dan/prj/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
@@ -20,7 +20,7 @@
         "n_examples" : 1,
         "learning_rate" : 0.01,
         "batch_size" : 1,
-        "epochs" : 50,
+        "epochs" : 20,
         "print_step" : 1
     },
     "val":
