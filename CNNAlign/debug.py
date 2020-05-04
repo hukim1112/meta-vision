@@ -1,4 +1,4 @@
-from test import data, train, model
+from test_codes import data, train, model
 import json, os
 import argparse
 

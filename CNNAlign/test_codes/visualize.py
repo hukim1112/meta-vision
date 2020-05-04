@@ -35,7 +35,7 @@ def show_TPS_image(images, moving_vectors):
     else:
         TypeError("input must be list, but type is {}".format(type(images)))
 
-def plot_images(images, plot_shape, moving_vectors):
+def plot_images(images, plot_shape, moving_vectors=None):
     rows, cols = plot_shape
     fig = plt.figure()
     for row in range(rows):
@@ -43,8 +43,8 @@ def plot_images(images, plot_shape, moving_vectors):
             image = images[row][col]
             image = draw_point(image)
             if row > 0:
-                print('sdsfd')
-                image = draw_arrow(image, moving_vectors[row][col])
+                if moving_vectors is not None:
+                    image = draw_arrow(image, moving_vectors[row][col])
             fig.add_subplot(rows, cols, row*cols+col+1).imshow(image)
     plt.show()
 

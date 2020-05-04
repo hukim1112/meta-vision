@@ -2,9 +2,9 @@ import numpy as np
 from data_loader import load_data
 from utils import image
 from . import visualize
-def synthesize_image_pair(config, splits):
-    datasets = load_data(splits, config)
-    ds = datasets['train'].batch(5)
+def synthesize_image_pair(config, split):
+    datasets = load_data([split], config)
+    ds = datasets[split].batch(config[split]['batch_size'])
     for image_A, image_B, parameters in ds.take(1):
         image_A = image_A.numpy()
         image_B = image_B.numpy()
