@@ -25,7 +25,7 @@ def train_step(image_A, image_B, label, model, optimizer):
         pred, score = model(image_A, image_B)
         loss = loss_fn(pred, label)
     
-    # score_std = tf.math.reduce_std(score)
+    score_std = tf.math.reduce_std(score)
     # if tf.math.is_nan(score_std):
     #     tf.print("score have nan? : ", score, summarize=16*16*16*16)
 
