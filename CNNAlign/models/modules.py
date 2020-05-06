@@ -1,12 +1,12 @@
 import tensorflow as tf
-from .backbones import resnet, prototypical_network
+from .backbones import resnet, prototypical_network, vgg16
 
 
 class Feature_Extractor(tf.keras.layers.Layer):
     def __init__(self, backbone_name):
         super(Feature_Extractor, self).__init__()
-        if backbone_name == 'resnet':
-            self.backbone = resnet()
+        if backbone_name == 'vgg16':
+            self.backbone = vgg16()
         elif backbone_name == 'prototypical_network':
             self.backbone = prototypical_network()
         else:
@@ -21,7 +21,7 @@ class Feature_Extractor(tf.keras.layers.Layer):
             tf.pow(features, 2), axis=-1))  # (N, H, W)
         l2_norm = tf.expand_dims(l2_norm, axis=-1)  # (N, H, W, 1)
         # (N, H, W, D) tensor divided by (N, H, W, 1) tensor
-        return features / l2_norm
+        return features / (l2_norm+0.00001)
 
     @staticmethod
     def channelwise_l2_normalize_debug(normalized_features):
@@ -44,33 +44,33 @@ class Correlation_network(tf.keras.layers.Layer):
         feature_B = feature_B[:, tf.newaxis, tf.newaxis, :, :, :]
         # correlation score has tensor shape as [batch, HA, WA, HB, WB]
         corr_score = tf.reduce_mean(tf.multiply(feature_A, feature_B), axis=-1)
-        '''
+        
         ambiguous_match_penalty = tf.math.sqrt(
             tf.reduce_sum(tf.pow(corr_score, 2), axis=[1, 2], keepdims=True))
         return tf.math.divide(corr_score, ambiguous_match_penalty)
         # see eq (2) in "End-to-end weakly-supervised semantic alignment"
-        '''
+
         return corr_score
 
-'''
+
 class Spatial_transformer_regressor(tf.keras.layers.Layer):
     def __init__(self, num_param):
         super(Spatial_transformer_regressor, self).__init__()
         self.regressor = tf.keras.Sequential([
-            tf.keras.layers.Conv3D(64, (5, 5, 5), activation='relu'),
+            tf.keras.layers.Conv2D(64, (5, 5), activation='relu'),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Conv3D(32, (3, 3, 3), activation='relu'),
+            tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(num_param),
         ])
 
     def call(self, correlation):
+        correlation = tf.reshape(correlation, [-1,16,16,256])
         return self.regressor(correlation)
 
+
 '''
-
-
 class Spatial_transformer_regressor(tf.keras.layers.Layer):
     def __init__(self, num_param):
         super(Spatial_transformer_regressor, self).__init__()
@@ -87,3 +87,4 @@ class Spatial_transformer_regressor(tf.keras.layers.Layer):
 
     def call(self, correlation):
         return self.regressor(correlation)
+'''

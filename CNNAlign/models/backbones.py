@@ -6,6 +6,9 @@ def resnet():
         include_top=False, weights='imagenet')
     return tf.keras.Model(resnet101.input, resnet101.layers[312].output)
 
+def vgg16():
+    vgg16 = tf.keras.applications.VGG16(weights='imagenet', input_shape=(64, 64, 3), include_top=False)
+    return tf.keras.Model(inputs=vgg16.layers[0].input, outputs=vgg16.layers[9].output)
 
 def prototypical_network():
     return tf.keras.Sequential([

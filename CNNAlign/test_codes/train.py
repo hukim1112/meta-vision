@@ -4,7 +4,7 @@ from data_loader import load_data
 from models.cnn_geo import CNN_geo
 from utils import image
 from . import visualize
-from CNNgeo import train
+from CNNgeo_debug import train
 import tensorflow as tf
 import numpy as np
 
@@ -12,7 +12,7 @@ def overfit(config, splits):
     train(config) # mode is overfitted.
 
 def result_test(config, splits):
-    model = CNN_geo("prototypical_network")
+    model = CNN_geo(config['backbone'])
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])
     ckpt = os.path.join(ckpt_dir, "{}-{}.h5".format(config['model_name'], str(config['train']['epochs'])))

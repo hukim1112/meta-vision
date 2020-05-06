@@ -4,6 +4,7 @@
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
     "model_name" : "CNNgeo",
+    "backbone" : "prototypical_network",
     "data" :
     {
         "method" : "synthesized_pair",
@@ -17,16 +18,16 @@
     },
     "train":
     {        
-        "n_examples" : 1,
+        "n_examples" : 1000,
         "learning_rate" : 0.001,
-        "batch_size" : 1,
+        "batch_size" : 16,
         "epochs" : 100,
-        "print_step" : 1
+        "print_step" : 10
     },
     "val":
     {
-        "n_examples" : 5,
-        "batch_size" : 5
+        "n_examples" : 1000,
+        "batch_size" : 16
     },
     "test":
     {
