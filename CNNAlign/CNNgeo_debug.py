@@ -71,8 +71,6 @@ def train(config):
                 image_a, image_b, label, model, optimizer)
             train_loss(t_loss)
 
-            tf.print("pred : ", pred, "label : ", label, sys.stdout)
-
             if step % config['train']['print_step'] == 0:
                 print('Training loss (for one batch) at step {}: {}'.format(
                     step, t_loss.numpy()))
