@@ -1,5 +1,5 @@
 {
-    "exp_desc" : "200501_exp1_learning_rate_is_matter",
+    "exp_desc" : "200507_regressor_filter_size_up",
     "dataset_name" : "mini_imagenet",
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "image_shape" : [64, 64, 3],
@@ -14,20 +14,20 @@
     "ckpt":
     {
         "save_type" : "latest",
-        "max_to_keep" : 100
+        "max_to_keep" : 10
     },
     "train":
     {        
-        "n_examples" : 1000,
-        "learning_rate" : 0.001,
-        "batch_size" : 16,
-        "epochs" : 100,
+        "n_examples" : 1,
+        "learning_rate" : 0.0001,
+        "batch_size" : 1,
+        "epochs" : 400,
         "print_step" : 10
     },
     "val":
     {
-        "n_examples" : 1000,
-        "batch_size" : 16
+        "n_examples" : 1,
+        "batch_size" : 1
     },
     "test":
     {

@@ -46,7 +46,7 @@ class Correlation_network(tf.keras.layers.Layer):
         corr_score = tf.reduce_mean(tf.multiply(feature_A, feature_B), axis=-1)
         
         ambiguous_match_penalty = tf.math.sqrt(
-            tf.reduce_sum(tf.pow(corr_score, 2), axis=[1, 2], keepdims=True))
+            tf.reduce_sum(tf.pow(corr_score, 2), axis=[3, 4], keepdims=True))
         return tf.math.divide(corr_score, ambiguous_match_penalty)
         # see eq (2) in "End-to-end weakly-supervised semantic alignment"
 
@@ -57,9 +57,9 @@ class Spatial_transformer_regressor(tf.keras.layers.Layer):
     def __init__(self, num_param):
         super(Spatial_transformer_regressor, self).__init__()
         self.regressor = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(64, (5, 5), activation='relu'),
+            tf.keras.layers.Conv2D(64, (7, 7), activation='relu'),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
+            tf.keras.layers.Conv2D(32, (5, 5), activation='relu'),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(num_param),
