@@ -9,9 +9,9 @@ import tensorflow as tf
 import numpy as np
 
 def overfit(config, splits):
-    train(config) # mode is overfitted.
+    return train(config) # mode is overfitted.
 
-def result_test(config, splits):
+def predict_test(config, splits):
     model = CNN_geo(config['backbone'])
     ckpt_dir = os.path.join(
         'checkpoints', config['model_name'], config['exp_desc'])
@@ -36,6 +36,23 @@ def result_test(config, splits):
                    zip(image_A.copy(), pred.copy())))    
     image_C = np.array(image_C)
     visualize.show_TPS_image([image_A, image_B, image_C], [np.ones_like(parameters), parameters, pred])    
+
+def draw_grid(image, grid_coord, color = (0, 100, 0), grid_shape = (16, 16)):
+    draw_image = image.copy()
+    H, W, C = draw_image.shape
+    grid_size = H/grid_shape[0], W/grid_shape[1]
+
+    start_pix_h = int(grid_size[0]*grid_coord[0])
+    end_pix_h = int(grid_size[0]*(1+grid_coord[0]))
+
+    start_pix_w = int(grid_size[1]*grid_coord[1])
+    end_pix_w = int(grid_size[1]*(1+grid_coord[1]))
+
+    draw_image[start_pix_h:end_pix_h, start_pix_w:end_pix_w, 2] = 100
+    return draw_image
+
+
+
 
 if __name__ == "__main__":
     pass

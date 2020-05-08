@@ -93,6 +93,8 @@ def train(config):
     print("Checkpoint directory : ", ckpt_dir)
     print("Tensorboard log directory : ", log_dir)
 
+    return model
+
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description=__doc__)
     argparser.add_argument(

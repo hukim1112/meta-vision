@@ -21,7 +21,7 @@
         "n_examples" : 1,
         "learning_rate" : 0.0001,
         "batch_size" : 1,
-        "epochs" : 400,
+        "epochs" : 200,
         "print_step" : 10
     },
     "val":

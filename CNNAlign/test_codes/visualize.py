@@ -79,8 +79,9 @@ def draw_arrow(image, moving_vectors):
     dst_point = dst_point.astype(np.int32)
     bordersize = 20
     for src, dst in zip(src_points, dst_point):
-        print(tuple(src+20), tuple(dst+20))
         draw_image = cv2.arrowedLine(draw_image, tuple(src+20), tuple(dst+20), 
                                      (1,0,0), 1)
         #draw_image = cv2.circle(draw_image, tuple(dst+20), 1, (1,0,0), -1)
     return draw_image
+
+
