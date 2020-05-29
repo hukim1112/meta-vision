@@ -1,29 +1,22 @@
-from test_codes import data, train, model
-import json, os
+import json
+import os
 import argparse
+import numpy as np
+import simulator as sim
 
-def test_data(config):
-    splits = ['train']
-    data.synthesize_image_pair(config, splits)
 
-def test_train(config):
-    train.overfit(config, ['train'])
-    #train.result_test(config, ['train'])
+def main():
+    parameters = np.zeros([9, 2], dtype=np.float32)
+    map_size = (16, 16)
+    ij = np.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
+                   [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
+                   [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]])
+    ij *= (map_size[0] - 1, map_size[1] - 1)
+    kl = sim.get_tgt_from_src(parameters, map_size, ij)
+    ijkl = np.concatenate([ij.astype(np.int32), kl], axis=-1)
 
-def test_model(config):
-    model.output(config, ['train'])
+    correlations = sim.generate_correlations(ijkl, map_size)
+
 
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser(description=__doc__)
-    argparser.add_argument(
-        '-c', '--config',
-        metavar='C',
-        default='None',
-        help='The Configuration file')
-    args = argparser.parse_args()
-    config = args.config
-    with open(config) as fp:
-        config = json.load(fp)
-    #test_model(config)
-    test_train(config)
-    #test_data(config)
+    main()
