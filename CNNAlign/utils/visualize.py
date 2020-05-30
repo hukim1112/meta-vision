@@ -3,19 +3,20 @@ import numpy as np
 import cv2
 
 
-def show_image(images):
+def show_image(images, figsize=(20, 50)):
     rows, cols = images.shape[:2]
-    fig = plt.figure()
-    for row in range(rows):
-        for col in range(cols):
-            image = images[row][col]
-            fig.add_subplot(rows, cols, row * col + col + 1).imshow(image)
+    fig = plt.figure(figsize=figsize)
+    for i in range(rows * cols):
+        row = i // cols
+        col = i % cols
+        image = images[row][col]
+        fig.add_subplot(rows, cols, i + 1).imshow(image)
     plt.show()
 
 
 def makeBorder(image, bordersize):
     draw_image = image.copy()
-    color = [255, 255, 255]
+    color = [1, 1, 1]
     draw_image = cv2.copyMakeBorder(draw_image,
                                     top=bordersize, bottom=bordersize,
                                     left=bordersize, right=bordersize,
@@ -31,7 +32,7 @@ def draw_point(image, bordersize, points=None):
         points = np.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
                            [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
                            [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]])
-    points = points * (W, H)
+    points = points * (W - 2 * bordersize, H - 2 * bordersize)
     points = points.astype(np.int32)
     for pnt in points:
         draw_image = cv2.circle(draw_image, tuple(
@@ -46,9 +47,9 @@ def draw_arrow(image, bordersize, moving_vectors, src_points=None):
         src_points = np.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
                                [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
                                [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]])
-    src_points = src_points * (W, H)
+    src_points = src_points * (W - 2 * bordersize, H - 2 * bordersize)
     src_points = src_points.astype(np.int32)
-    moving_vectors = moving_vectors * (W, H)
+    moving_vectors = moving_vectors * (W - 2 * bordersize, H - 2 * bordersize)
     dst_points = src_points + moving_vectors
     dst_points = dst_points.astype(np.int32)
 

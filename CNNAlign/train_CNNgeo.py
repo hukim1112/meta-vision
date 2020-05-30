@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 import json
 import argparse
 from data_loader import load_data
@@ -12,22 +13,19 @@ os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 
 def loss_fn(pred, label):
-    loss = tf.sqrt(tf.reduce_sum(tf.pow(pred-label, 2), axis=[-1,-2]))
+    loss = tf.sqrt(tf.reduce_sum(tf.pow(pred - label, 2), axis=[-1, -2]))
     loss_mean = tf.reduce_mean(loss)
-    #loss_sum = tf.reduce_sum(loss)
-    #tf.print("pred : ", pred, "reduce_sum: ", loss_sum, "reduce_mean: ", loss_mean, output_stream=sys.stdout)
     return loss_mean
 
 
 @tf.function
 def train_step(image_A, image_B, label, model, optimizer):
     with tf.GradientTape() as tape:
-        pred, _ = model(image_A, image_B)
+        pred, score = model(image_A, image_B)
         loss = loss_fn(pred, label)
-    tf.print("score : ", _[0,0,0], sys.stdout)
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-    return pred, loss
+    return pred, loss, score
 
 
 @tf.function
@@ -35,6 +33,7 @@ def val_step(image_A, image_B, label, model):
     pred, _ = model(image_A, image_B)
     loss = loss_fn(pred, label)
     return pred, loss
+
 
 def train(config):
     batch_size = config['train']['batch_size']
@@ -44,11 +43,12 @@ def train(config):
         batch_size).prefetch(tf.data.experimental.AUTOTUNE)
     val_ds = datasets['val'].batch(batch_size)
 
-    model = CNN_geo("prototypical_network")
+    model = CNN_geo(config['backbone'])
     optimizer = tf.keras.optimizers.Adam(
         learning_rate=config['train']['learning_rate'])
 
     train_loss = tf.metrics.Mean(name='train_loss')
+    train_score_std = tf.metrics.Mean(name='train_score_std')
     val_loss = tf.metrics.Mean(name='val_loss')
 
     ckpt_dir = os.path.join(
@@ -61,11 +61,11 @@ def train(config):
     for epoch in range(config['train']['epochs']):
         print("start of epoch {}".format(epoch + 1))
         for step, (image_a, image_b, label) in enumerate(train_ds):
-            pred, t_loss = train_step(
+            pred, t_loss, score = train_step(
                 image_a, image_b, label, model, optimizer)
+            score_std = tf.math.reduce_std(score)
             train_loss(t_loss)
-
-            tf.print("pred : ", pred, "label : ", label, sys.stdout)
+            train_score_std(score_std)
 
             if step % config['train']['print_step'] == 0:
                 print('Training loss (for one batch) at step {}: {}'.format(
@@ -80,13 +80,54 @@ def train(config):
             tf.summary.scalar(
                 'train_loss', train_loss.result(), step=epoch + 1)
             tf.summary.scalar('val_loss', val_loss.result(), step=epoch + 1)
+            tf.summary.scalar(
+                'score std', train_score_std.result(), step=epoch + 1)
             summary_writer.flush()
         # Save your model
         saver.save_or_not(model, epoch + 1, val_loss.result())
         train_loss.reset_states()
+        train_score_std.reset_states()
         val_loss.reset_states()
     print("Checkpoint directory : ", ckpt_dir)
     print("Tensorboard log directory : ", log_dir)
+    return model
+
+
+def train_debug(config, tentative_penalty):
+    batch_size = config['train']['batch_size']
+    splits = ['train']
+    datasets = load_data(splits, config)
+    train_ds = datasets['train'].batch(
+        batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+
+    model = CNN_geo(config['backbone'], tentative_penalty)
+    optimizer = tf.keras.optimizers.Adam(
+        learning_rate=config['train']['learning_rate'])
+
+    train_loss = tf.metrics.Mean(name='train_loss')
+    train_score_std = tf.metrics.Mean(name='train_score_std')
+
+    x = []
+    y_loss = []
+    y_score_std = []
+    for epoch in range(config['train']['epochs']):
+        for step, (image_a, image_b, label) in enumerate(train_ds):
+            pred, t_loss, score = train_step(
+                image_a, image_b, label, model, optimizer)
+            score_std = tf.math.reduce_std(score)
+            train_loss(t_loss)
+            train_score_std(score_std)
+        template = 'Epoch {}, Loss: {}, score std {}'
+        print(template.format(epoch + 1, train_loss.result(), train_score_std.result()))
+        x.append(epoch)
+        y_loss.append(train_loss.result().numpy())
+        y_score_std.append(train_score_std.result().numpy())
+
+        train_loss.reset_states()
+        train_score_std.reset_states()
+
+    return model, x, y_loss, y_score_std
+
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description=__doc__)
