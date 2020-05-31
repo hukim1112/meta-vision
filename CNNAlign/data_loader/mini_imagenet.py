@@ -37,7 +37,7 @@ def load_mini_imagenet(splits, config):
             ds[split] = get_dataset_of_synthesized_pair(split, data, config)
         elif config['data']['method'] == 'episodic_learning':
             ds[split] = get_dataset_of_episodes(split, data, config)
-        elif config['data']['method'] == 'classification' :
+        elif config['data']['method'] == 'classification':
             ds[split] = get_dataset_of_classification(split, data, config)
         else:
             raise ValueError("Wrong data processing type : {}".format(
@@ -47,7 +47,7 @@ def load_mini_imagenet(splits, config):
 
 def get_dataset_of_synthesized_pair(split, data, config):
     data = np.reshape(data, [-1, 84, 84, 3])
-    #np.random.shuffle(data)
+    # np.random.shuffle(data)
     data = data[:config[split]['n_examples']]
     n_examples = len(data)
     print("{} dataset amount : {}".format(split, n_examples))
@@ -71,8 +71,8 @@ def get_dataset_of_synthesized_pair(split, data, config):
 
 
 def use_py_function(image, tps_random_rate, pad_ratio, output_size):
-    moving_vectors = (tf.random.uniform([9, 2]) - 0.5) * 2 * tps_random_rate
-    return tf.py_function(make_synthesized_pair, [image, moving_vectors, pad_ratio, output_size], [tf.float32, tf.float32, tf.float32])
+    motion_parameters = (tf.random.uniform([9, 2]) - 0.5) * 2 * tps_random_rate
+    return tf.py_function(make_synthesized_pair, [image, motion_parameters, pad_ratio, output_size], [tf.float32, tf.float32, tf.float32])
 
 
 def get_dataset_of_episodes(split, data, config):
@@ -100,6 +100,6 @@ def get_dataset_of_episodes(split, data, config):
 
     return data
 
+
 def get_dataset_of_classification(split, data, config):
     return data
-

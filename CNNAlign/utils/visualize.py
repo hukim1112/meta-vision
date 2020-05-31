@@ -40,7 +40,7 @@ def draw_point(image, bordersize, points=None):
     return draw_image
 
 
-def draw_arrow(image, bordersize, moving_vectors, src_points=None):
+def draw_arrow(image, bordersize, motion_parameters, src_points=None):
     draw_image = image.copy()
     H, W, C = image.shape
     if src_points is None:
@@ -49,8 +49,9 @@ def draw_arrow(image, bordersize, moving_vectors, src_points=None):
                                [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]])
     src_points = src_points * (W - 2 * bordersize, H - 2 * bordersize)
     src_points = src_points.astype(np.int32)
-    moving_vectors = moving_vectors * (W - 2 * bordersize, H - 2 * bordersize)
-    dst_points = src_points + moving_vectors
+    motion_parameters = motion_parameters * \
+        (W - 2 * bordersize, H - 2 * bordersize)
+    dst_points = src_points + motion_parameters
     dst_points = dst_points.astype(np.int32)
 
     for src, dst in zip(src_points, dst_points):

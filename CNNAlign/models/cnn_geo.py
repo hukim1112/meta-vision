@@ -20,9 +20,9 @@ class CNN_geo(tf.keras.Model):
         if self.tentative_penalty:
             corr_scores = self.correlation_network.tentative_penalty(
                 corr_scores)
-        geo_parameters = self.geo_parameter_regressor(corr_scores)
-        geo_parameters = tf.reshape(geo_parameters, [-1, 9, 2])
-        return geo_parameters, corr_scores
+        motion_parameters = self.geo_parameter_regressor(corr_scores)
+        motion_parameters = tf.reshape(motion_parameters, [-1, 9, 2])
+        return motion_parameters, corr_scores
 
     def save(self, ckpt_path):
         self.save_weights(ckpt_path)

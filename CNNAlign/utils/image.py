@@ -49,16 +49,16 @@ def pad_image(image, pad_ratio):
     return padded_image
 
 
-def synthesize_image(image, moving_vectors, output_size, bbox=None, pad_ratio=None):
+def synthesize_image(image, motion_parameters, output_size, bbox=None, pad_ratio=None):
     '''
         input : 
                 'original image', 
-                'moving_vectors' : None or array of 9 vectors which get source points moved into destination points.
+                'motion_parameters' : None or array of 9 vectors which get source points moved into destination points.
                 'bbox' : None or a tuple of 4 integers. A tuple of 4 values which means (x_min, y_min, x_max, y_max) of a cropping box respectively. It exists when the image is cropped.
                 'pad_ratio' : None or a float number.
                 It exists when the image is padded.
 
-        output : padded_image, moving_vectors(sampled randomly)
+        output : padded_image, motion_parameters(sampled randomly)
     '''
     if bbox is None:
         src_points = np.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
@@ -76,8 +76,8 @@ def synthesize_image(image, moving_vectors, output_size, bbox=None, pad_ratio=No
                                [nx0, ny1],
                                [(nx0 + nx1) / 2, ny1],
                                [nx1, ny1]])
-        moving_vectors[:, 0] = moving_vectors[:, 0] * (nx1 - nx0)
-        moving_vectors[:, 1] = moving_vectors[:, 1] * (ny1 - ny0)
+        motion_parameters[:, 0] = motion_parameters[:, 0] * (nx1 - nx0)
+        motion_parameters[:, 1] = motion_parameters[:, 1] * (ny1 - ny0)
 
     if pad_ratio is None:
         nx0, ny0 = src_points[0]
@@ -93,9 +93,9 @@ def synthesize_image(image, moving_vectors, output_size, bbox=None, pad_ratio=No
         nx0, ny0 = src_points[0]
         nx1, ny1 = src_points[-1]
         bbox = denormalize_bbox((nx0, ny0, nx1, ny1), image.shape[:2])
-        moving_vectors[:, 0] = moving_vectors[:, 0] / (1 + 2 * pad_ratio)
-        moving_vectors[:, 1] = moving_vectors[:, 1] / (1 + 2 * pad_ratio)
-    dst_points = src_points + moving_vectors
+        motion_parameters[:, 0] = motion_parameters[:, 0] / (1 + 2 * pad_ratio)
+        motion_parameters[:, 1] = motion_parameters[:, 1] / (1 + 2 * pad_ratio)
+    dst_points = src_points + motion_parameters
     x_min, y_min, x_max, y_max = bbox
     warped_image = interpolate_with_TPS(image, src_points, dst_points)
     if warped_image.shape[0] < y_min + output_size[0] or warped_image.shape[1] < x_min + output_size[1]:
@@ -124,10 +124,10 @@ def denormalize_bbox(coord, shape):
     return x_min, y_min, x_max, y_max
 
 
-def make_synthesized_pair(image, moving_vectors, pad_ratio, output_size=(64, 64)):
+def make_synthesized_pair(image, motion_parameters, pad_ratio, output_size=(64, 64)):
     image = image.numpy()
-    moving_vectors = moving_vectors.numpy()
+    motion_parameters = motion_parameters.numpy()
     cropped_image, bbox = crop_image_randomly(image, output_size)
     warped_image = synthesize_image(
-        image.copy(), moving_vectors.copy(), output_size, bbox, pad_ratio)
-    return cropped_image, warped_image, moving_vectors
+        image.copy(), motion_parameters.copy(), output_size, bbox, pad_ratio)
+    return cropped_image, warped_image, motion_parameters
