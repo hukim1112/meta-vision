@@ -43,7 +43,7 @@ def train(config):
         batch_size).prefetch(tf.data.experimental.AUTOTUNE)
     val_ds = datasets['val'].batch(batch_size)
 
-    model = CNN_geo(config['backbone'])
+    model = CNN_geo(config['backbone'], tentative_penalty=True)
     optimizer = tf.keras.optimizers.Adam(
         learning_rate=config['train']['learning_rate'])
 
