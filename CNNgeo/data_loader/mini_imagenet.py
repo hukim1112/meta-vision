@@ -52,7 +52,6 @@ def get_dataset_of_synthesized_pair(split, data, config):
     n_examples = len(data)
     print("{} dataset amount : {}".format(split, n_examples))
     np.random.shuffle(data)
-    data /= 255.
     data = tf.data.Dataset.from_tensor_slices(data)
     if split == 'train':
         if n_examples > 1000:
