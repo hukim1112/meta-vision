@@ -5,6 +5,8 @@
 /outputs
 /results
 .ipynb_checkpoints/
+checkpoints/
+logs/
 *.pyc
 *.mp4
 *.avi
