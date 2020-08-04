@@ -1,6 +1,11 @@
-checkpoints/
-__pycache__/
-logs/
-outputs/
+/cocoapi
+/datasets
+/logs
+/checkpoints
+/outputs
+/results
 .ipynb_checkpoints/
-.pyc
+*.pyc
+*.mp4
+*.avi
+*.swp

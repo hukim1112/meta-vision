@@ -1,0 +1,37 @@
+{
+    "exp_desc" : "200424_best_cnngeo",
+    "dataset_name" : "mini_imagenet",
+    "data_dir" : "/home/files/datasets/mini_imagenet",
+    "image_shape" : [64, 64, 3],
+    "model_name" : "CNNgeo",
+    "backbone" : "prototypical_network",
+    "data" :
+    {
+        "method" : "synthesized_pair",
+        "tps_random_rate" : 0.2,
+        "pad_ratio" : 0.2
+    },
+    "ckpt":
+    {
+        "save_type" : "best",
+        "max_to_keep" : 10
+    },
+    "train":
+    {        
+        "n_examples" : -1,
+        "learning_rate" : 1e-5,
+        "batch_size" : 128,
+        "epochs" : 300,
+        "print_step" : 20
+    },
+    "val":
+    {
+        "n_examples" : -1,
+        "batch_size" : 128
+    },
+    "test":
+    {
+        "n_examples" : -1,
+        "batch_size" : 128
+    }
+}
