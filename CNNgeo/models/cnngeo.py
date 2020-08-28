@@ -4,6 +4,7 @@ import cv2
 import tensorflow as tf
 from functools import partial
 from geo_transform.tf_tps import ThinPlateSpline as tps
+from models.module import feature_l2_normalization, normalize_correlation
 
 
 class Correlation_network(tf.keras.layers.Layer):
@@ -24,7 +25,7 @@ class Correlation_network(tf.keras.layers.Layer):
         return corr_score
 
 
-class Spatial_regressor(tf.keras.layers.Layer):
+class Spatial_regressor(tf.keras.Model):
     def __init__(self, num_param):
         super(Spatial_regressor, self).__init__()
         self.regressor = tf.keras.Sequential([
@@ -60,4 +61,4 @@ class CNN_geotransform(tf.keras.Model):
         correlations = tf.keras.layers.Activation("relu")(correlations)
         correlations = normalize_correlation(correlations)
         geo_parameters = self.regressor(correlations)
-        return geo_parameters
+        return geo_parameters, correlations

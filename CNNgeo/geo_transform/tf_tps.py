@@ -66,8 +66,8 @@ def ThinPlateSpline(coord, vector, out_size):
         y_s = tf.slice(T_g, [0, 1, 0], [-1, 1, -1])
         x_s_meshgrid = tf.reshape(x_s, [-1, out_height_f, out_width_f])
         y_s_meshgrid = tf.reshape(y_s, [-1, out_height_f, out_width_f])
-        x_s_meshgrid = (x_s_meshgrid + 1) * out_width_f / 2
-        y_s_meshgrid = (y_s_meshgrid + 1) * out_height_f / 2
+        x_s_meshgrid = (x_s_meshgrid + 1) * (out_width_f-1)/2
+        y_s_meshgrid = (y_s_meshgrid + 1) * (out_height_f-1)/2
 
         return x_s_meshgrid, y_s_meshgrid
 

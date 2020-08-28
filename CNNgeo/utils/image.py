@@ -4,6 +4,36 @@ import cv2
 import geo_transform as tps
 import tensorflow as tf
 
+def restore_original_image_from_array(x, data_format=None):
+    mean = [103.939, 116.779, 123.68]
+
+    # Zero-center by mean pixel
+    if data_format == 'channels_first':
+        if x.ndim == 3:
+            x[0, :, :] += mean[0]
+            x[1, :, :] += mean[1]
+            x[2, :, :] += mean[2]
+        else:
+            x[:, 0, :, :] += mean[0]
+            x[:, 1, :, :] += mean[1]
+            x[:, 2, :, :] += mean[2]
+    else:
+        x[..., 0] += mean[0]
+        x[..., 1] += mean[1]
+        x[..., 2] += mean[2]
+
+    if data_format == 'channels_first':
+        # 'BGR'->'RGB'
+        if x.ndim == 3:
+            x = x[::-1, ...]
+        else:
+            x = x[:, ::-1, ...]
+    else:
+        # 'BGR'->'RGB'
+        x = x[..., ::-1]
+
+    return x
+
 def interpolate_with_TPS(img, c_src, c_dst, dshape=None):
     dshape = dshape or img.shape
     theta = tps.tps_theta_from_points(c_src, c_dst, reduced=True)
