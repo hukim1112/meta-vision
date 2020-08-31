@@ -18,6 +18,10 @@ def pad_image(image, pad_ratio):
         image, top, bottom, left, right, cv2.BORDER_REFLECT)
     return padded_image
 
+def synthesize_with_tps(image, control_points, motion_vectors, output_shape):
+    x_s, y_s = tps(control_points[tf.newaxis, ::], -motion_vectors[tf.newaxis, ::], output_shape)
+    synth_image = cv2.remap(image, x_s[0].numpy(), y_s[0].numpy(), cv2.INTER_CUBIC)
+    return synth_image
 
 def py_image_process(image, motion_vectors, tps_random_rate, output_size):
     image = tf.keras.applications.vgg16.preprocess_input(image)

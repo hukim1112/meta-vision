@@ -1,21 +1,19 @@
 import os, argparse, json
-import cv2
-import random
 import numpy as np
 from matplotlib import pyplot as plt
+import cv2
 import tensorflow as tf
 from tensorflow.keras.applications.vgg16 import preprocess_input
-from functools import partial
 from utils import tf_session
 from geo_transform.tf_tps import ThinPlateSpline as tps
-from data_loader.dev_dataset import tf_image_process
-
+#from models.cnngeo import CNN_geotransform
 from models.cnngeo import CNN_geotransform
+from data_loader import load_data
 
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 tf_session.setup_gpus(True, 0.95)
 
-def train_geo(config):
+def train_cnngeo(config):
     def loss_fn(preds, labels):
         control_points = tf.constant([[-1.0, -1.0], [0.0, -1.0], [1.0, -1.0],
                                    [-1.0, 0.0], [0.0, 0.0], [1.0, 0.0],
@@ -23,7 +21,7 @@ def train_geo(config):
         num_batch = preds.shape[0]
         pred_grid_x, pred_grid_y = tps(tf.tile(control_points[tf.newaxis,::], [num_batch,1,1]), -preds, (20, 20))
         gt_grid_x, gt_grid_y = tps(tf.tile(control_points[tf.newaxis,::], [num_batch,1,1]), -labels, (20, 20))
-        
+
         dist = tf.sqrt(tf.pow(pred_grid_x - gt_grid_x, 2) + tf.pow(pred_grid_y - gt_grid_y, 2))
         loss_mean = tf.reduce_mean(dist)
         return loss_mean
@@ -37,41 +35,55 @@ def train_geo(config):
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
         return loss
 
-    _datapath = "/home/files/datasets/PF-dataset-PASCAL/JPEGImages"
-    filelist = os.listdir(_datapath)
-    random.shuffle(filelist)
-    input_size = (200, 200)
-    images = []
-    for f in filelist:
-        _path = os.path.join(_datapath, f)
-        img = cv2.imread(_path)[:,:,::-1]
-        img = cv2.resize(img, input_size, interpolation=cv2.INTER_AREA)
-        images.append(img)
-    images = np.array(images, dtype=np.float32)
-    tps_random_rate = 0.4
-    output_size = (200, 200)
-    map_func = partial(tf_image_process, tps_random_rate=tps_random_rate,
-                          output_size=output_size)
-    ds = tf.data.Dataset.from_tensor_slices(images).shuffle(2000)
-    ds = ds.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    ds = ds.batch(10)
+    #1. dataset pipeline
+    PF_Pascal = load_data("PF_Pascal")
+    dataset = PF_Pascal(config["data_dir"])
+    input_shape = config["image_shape"][:2]
+    n_examples = config["n_examples"]
+    data_normalize = tf.keras.applications.vgg16.preprocess_input
+    ds = dataset.load_pipeline("SynthesizedImagePair", input_shape, n_examples, data_normalize)
+    ds = ds.shuffle(1000).batch(config["train"]["batch_size"])
     for A, B, p in ds.take(1):
         print(A.shape, B.shape)
         print(p.shape)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=1E-4)
 
+    # 2. load model
+    if config["backbone"] == "vgg16":
+        vgg16 = tf.keras.applications.VGG16(weights='imagenet', input_shape=(input_size[0], input_size[1], 3),
+                                            include_top=False)
+        output_layer = vgg16.get_layer("block4_conv3")
+        output_layer.activation = None
+        feature_extractor = tf.keras.Model(inputs=vgg16.input, outputs=output_layer.output)
+    cnngeo = CNN_geotransform(feature_extractor, 18)
+
+    # 3. Training
+    model_name = config["model_name"]
+    exp_desc = config["exp_desc"]
+
+    log_dir = os.path.join('logs', model_name, exp_desc)
+    summary_writer = tf.summary.create_file_writer(log_dir)
+    if os.path.isdir(log_dir):
+        raise ValueError("log directory exists. checkout your experiment name in configure file.")
+
+    ckpt_dir = os.path.join('checkpoints', model_name, exp_desc)
+    os.makedirs(ckpt_dir, exist_ok=True)
+    if os.path.isdir(ckpt_dir):
+        raise ValueError("checkpoint directory exists. checkout your experiment name in configure file.")
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=config["learning_rate"])
     train_loss = tf.metrics.Mean(name='train_loss')
-    x_axis = []
-    y_loss = []
-    for epoch in range(4000):
+    for epoch in range(config["train"]["epochs"]):
         for step, (image_a, image_b, labels) in enumerate(ds):
             t_loss = train_step(image_a, image_b, labels, cnngeo, optimizer)
             train_loss(t_loss)
         template = 'Epoch {}, Loss: {}'
         print(template.format(epoch + 1, train_loss.result()))
-        x_axis.append(epoch)
-        y_loss.append(train_loss.result().numpy())
+        with summary_writer.as_default():
+            tf.summary.scalar('train_loss', train_loss, step=epoch)
         train_loss.reset_states()
+        if (epoch+1)%20 == 0:
+            model.save(os.path.join(ckpt_dir,
+                                    "{}-{}.h5".format(model_name, epoch)))
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -82,11 +94,9 @@ if __name__=="__main__":
     with open(config, 'r') as file:
         config = json.load(file)
 
-    if config['model'] == "cnngeo":
+    if config['model_name'] == "cnngeo":
         train_cnngeo(config)
-    elif config['model'] == "cnnalign":
+    elif config['model_name'] == "cnnalign":
         train_cnnalign(config)
     else:
         raise ValueError("Make sure the model name is correct in your config file.")
-
-

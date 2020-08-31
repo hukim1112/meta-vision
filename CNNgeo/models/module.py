@@ -43,16 +43,16 @@ def generate_inlier_mask(geo_parameters, geo_transform, map_size):
     #calculate estimated coordinates of source grids on target feature grids
     control_points = tf.constant([[-1.0, -1.0], [0.0, -1.0], [1.0, -1.0],
                                        [-1.0, 0.0], [0.0, 0.0], [1.0, 0.0],
-                                       [-1.0, 1.0], [0.0, 1.0], [1.0, 1.0]], dtype=tf.float32)  
+                                       [-1.0, 1.0], [0.0, 1.0], [1.0, 1.0]], dtype=tf.float32)
     control_points = tf.tile(control_points[tf.newaxis,::], [batch_size, 1, 1]) # [BN, 9, 2]
     x_s, y_s = geo_transform(control_points, -geo_parameters, (height,width))
     #calculate BN remaps
     remaps = tf.stack([x_s, y_s], axis=-1) #[BN,H,W,2]
-    #repeat each remap H*W times. 
+    #repeat each remap H*W times.
     remaps = tf.tile(remaps[:,tf.newaxis,::], [1,height*width, 1, 1, 1]) #[BN,H*W,H,W,2]
     print(remaps.shape)
     remaps = tf.reshape(remaps, [batch_size*height*width,height,width,2]) #[BN*H*W,H,W,2]
 
     inlier_masks = tfa.image.resampler(identity_mask, remaps) #inputs <= identity_mask([BN*H*W,H,W,1]) remaps([BN*H*W,H,W,2])
-    inlier_masks = tf.reshape(inlier_masks, [batch_size, height, width, height, width]) #reshape again. 
+    inlier_masks = tf.reshape(inlier_masks, [batch_size, height, width, height, width]) #reshape again.
     return inlier_masks #[BN,H,W,H,W]
