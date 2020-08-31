@@ -1,9 +1,8 @@
 from .datasets import PF_Pascal
 
-def load_data(name, splits=None):
+def load_data(name):
     if name == "PF_Pascal":
-        data_dir = config['data_dir']
-        dataset = PF_Pascal(data_dir)
+        return PF_Pascal
     else:
         raise ValueError("Wrong dataset name : {}".format(
             config["dataset_name"]))

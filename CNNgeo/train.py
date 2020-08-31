@@ -36,54 +36,51 @@ def train_cnngeo(config):
         return loss
 
     #1. dataset pipeline
-    PF_Pascal = load_data("PF_Pascal")
+    PF_Pascal = load_data(config["dataset_name"])
     dataset = PF_Pascal(config["data_dir"])
-    input_shape = config["image_shape"][:2]
-    n_examples = config["n_examples"]
+    input_shape = tuple(config["image_shape"][:2])
+    n_examples = config["train"]["n_examples"]
     data_normalize = tf.keras.applications.vgg16.preprocess_input
     ds = dataset.load_pipeline("SynthesizedImagePair", input_shape, n_examples, data_normalize)
-    ds = ds.shuffle(1000).batch(config["train"]["batch_size"])
+    ds = ds.shuffle(400).batch(config["train"]["batch_size"]).prefetch(tf.data.experimental.AUTOTUNE)
     for A, B, p in ds.take(1):
         print(A.shape, B.shape)
         print(p.shape)
-
     # 2. load model
     if config["backbone"] == "vgg16":
-        vgg16 = tf.keras.applications.VGG16(weights='imagenet', input_shape=(input_size[0], input_size[1], 3),
+        vgg16 = tf.keras.applications.VGG16(weights='imagenet', input_shape=(input_shape[0], input_shape[1], 3),
                                             include_top=False)
         output_layer = vgg16.get_layer("block4_conv3")
         output_layer.activation = None
         feature_extractor = tf.keras.Model(inputs=vgg16.input, outputs=output_layer.output)
     cnngeo = CNN_geotransform(feature_extractor, 18)
-
     # 3. Training
     model_name = config["model_name"]
     exp_desc = config["exp_desc"]
 
     log_dir = os.path.join('logs', model_name, exp_desc)
-    summary_writer = tf.summary.create_file_writer(log_dir)
     if os.path.isdir(log_dir):
         raise ValueError("log directory exists. checkout your experiment name in configure file.")
+    summary_writer = tf.summary.create_file_writer(log_dir)
 
     ckpt_dir = os.path.join('checkpoints', model_name, exp_desc)
-    os.makedirs(ckpt_dir, exist_ok=True)
     if os.path.isdir(ckpt_dir):
         raise ValueError("checkpoint directory exists. checkout your experiment name in configure file.")
-
-    optimizer = tf.keras.optimizers.Adam(learning_rate=config["learning_rate"])
+    os.makedirs(ckpt_dir, exist_ok=True)
+    
+    optimizer = tf.keras.optimizers.Adam(learning_rate=config["train"]["learning_rate"])
     train_loss = tf.metrics.Mean(name='train_loss')
     for epoch in range(config["train"]["epochs"]):
         for step, (image_a, image_b, labels) in enumerate(ds):
             t_loss = train_step(image_a, image_b, labels, cnngeo, optimizer)
             train_loss(t_loss)
         template = 'Epoch {}, Loss: {}'
-        print(template.format(epoch + 1, train_loss.result()))
+        print(template.format(epoch + 1, train_loss.result()))   
         with summary_writer.as_default():
-            tf.summary.scalar('train_loss', train_loss, step=epoch)
+            tf.summary.scalar('train_loss', train_loss.result(), step=epoch)
         train_loss.reset_states()
-        if (epoch+1)%20 == 0:
-            model.save(os.path.join(ckpt_dir,
-                                    "{}-{}.h5".format(model_name, epoch)))
+        if (epoch==0) or (epoch+1)%20 == 0:
+            cnngeo.save_weights(os.path.join(ckpt_dir, "{}-{}.h5".format(model_name, epoch)))
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -93,7 +90,7 @@ if __name__=="__main__":
     config = args.config
     with open(config, 'r') as file:
         config = json.load(file)
-
+    
     if config['model_name'] == "cnngeo":
         train_cnngeo(config)
     elif config['model_name'] == "cnnalign":

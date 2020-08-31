@@ -23,12 +23,16 @@ class PF_Pascal():
         self.num_category = len(self.category_list)
 
     def SynthesizedImagePairMode(self, input_shape, num_examples, data_normalize):
-        image_list = os.listdir(self.PATH_TO_JPEGS)[:num_examples]
+        if num_examples == -1:
+            image_list = os.listdir(self.PATH_TO_JPEGS)
+        elif num_examples > 0:
+            image_list = os.listdir(self.PATH_TO_JPEGS)[:num_examples]
+        else:
+            raise ValueError("wrong num_examples : {}".format(num_examples))
         random.shuffle(image_list)
         for imagename in image_list:
             imageA = cv2.imread(os.path.join(self.PATH_TO_JPEGS, imagename))[:,:,::-1]
             imageA = cv2.resize(imageA, input_shape, interpolation = cv2.INTER_AREA)
-
             #imageA => padding => tps transform => imageB
             pad_ratio = 0.3
             padded_image = pad_image(imageA.copy(), pad_ratio)
@@ -39,10 +43,10 @@ class PF_Pascal():
                                            [-1.0, 1.0], [0.0, 1.0], [1.0, 1.0]], dtype=tf.float32)
                 padding causes new positions of control points.
             '''
-            new_position = 1 / (1 + pad_ratio)
-            control_points = tf.constant([[-ratio, -ratio], [0.0, -ratio], [ratio, -ratio],
-                                          [-ratio, 0.0], [0.0, 0.0], [ratio, 0.0],
-                                          [-ratio, ratio], [0.0, ratio], [ratio, ratio]], dtype=tf.float32)
+            np = 1 / (1 + pad_ratio)
+            control_points = tf.constant([[-np, -np], [0.0, -np], [np, -np],
+                                          [-np, 0.0], [0.0, 0.0], [np, 0.0],
+                                          [-np, np], [0.0, np], [np, np]], dtype=tf.float32)
             tps_random_rate = 0.3/(1+pad_ratio)
             #original random rate is 0.3. but images to be synthesized are padded, therefore divide it with (1+pad_ratio)
             motion_vectors = (tf.random.uniform([9, 2]) - 0.5) * 2 * tps_random_rate
@@ -82,5 +86,6 @@ class PF_Pascal():
         elif mode == "SynthesizedImagePair":
             gen = partial(self.SynthesizedImagePairMode, input_shape, num_examples, data_normalize)
             ds = tf.data.Dataset.from_generator(gen, (tf.float32, tf.float32, tf.float32))
+            return ds
         else:
             print("not yet implemented")

@@ -20,7 +20,7 @@
     {
         "n_examples" : -1,
         "learning_rate" : 1e-5,
-        "batch_size" : 128,
+        "batch_size" : 10,
         "epochs" : 300,
         "print_step" : 20
     },
