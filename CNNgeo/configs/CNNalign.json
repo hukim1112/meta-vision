@@ -1,0 +1,37 @@
+{
+    "exp_desc" : "cnnalign_base",
+    "model_name" : "cnnalign",
+    "dataset_name" : "PF_Pascal",
+    "data_dir" : "/home/files/datasets/PF-dataset-PASCAL",
+    "image_shape" : [200, 200, 3],
+    "backbone" : "vgg16",
+    "data" :
+    {
+        "method" : "categorical_pair",
+        "tps_random_rate" : 0.2,
+        "pad_ratio" : 0.2
+    },
+    "ckpt":
+    {
+        "save_type" : "best",
+        "max_to_keep" : 10
+    },
+    "train":
+    {
+        "n_examples" : -1,
+        "learning_rate" : 1e-5,
+        "batch_size" : 10,
+        "epochs" : 300,
+        "print_step" : 20
+    },
+    "val":
+    {
+        "n_examples" : -1,
+        "batch_size" : 128
+    },
+    "test":
+    {
+        "n_examples" : -1,
+        "batch_size" : 128
+    }
+}
