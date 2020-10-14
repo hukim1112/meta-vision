@@ -19,6 +19,12 @@ checkpoint_load(model, pretrained_type, checkpoint_name)
         if split not in ['train', 'test']:
             raise ValueError('Unknown split name {}'.format(split))
         model = checkpoint_load(model, split, config)
+    elif config['model_name'] == "bag_of_prototypes":
+        h, w, c = config['input_shape']
+        model = Bag_of_prototypes(h, w, c)
+        if split not in ['train', 'test']:
+            raise ValueError('Unknown split name {}'.format(split))
+        model = checkpoint_load(model, split, config)
     else:
         raise ValueError(f"Unknow model: {config['model_name']}")
     return model
