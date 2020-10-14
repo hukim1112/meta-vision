@@ -1,4 +1,5 @@
 from .prototypical_network import Prototypical_network
+from .bag_of_prototypes import Bag_of_prototypes
 
 
 def load_model(split, config):

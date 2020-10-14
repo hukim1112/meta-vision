@@ -2,11 +2,11 @@
     "dataset_name" : "mini_imagenet",
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "input_shape" : [84, 84, 3],
-    "model_name" : "prototypical_networks",
+    "model_name" : "bag_of_prototypes",
     "checkpoint_dir" : "checkpoints",
     "train":
     {        
-        "gpu_id" : "0",
+        "gpu_id" : "1",
         "n_epoch" : 300,
         "n_episode" : 100,
         "n_way" : 30,

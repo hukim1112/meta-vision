@@ -6,10 +6,13 @@ from models import load_model
 from trainers.trainer import Protonet_trainer
 from matplotlib import pyplot as plt
 import tensorflow as tf
-
+import argparse
 
 def main():
-    args = parser.get_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config', metavar='config_file',
+                                        help='The name of config file.')
+    args = parser.parse_args()
     config = args.config
     with open(config, "r") as file:
         config = json.load(file)

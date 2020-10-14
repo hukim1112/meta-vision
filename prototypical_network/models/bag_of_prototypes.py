@@ -5,7 +5,7 @@ from tensorflow.keras import Model
 from tensorflow.keras.models import load_model
 
 
-class Prototypical_network(Model):
+class Bag_of_prototypes(Model):
     """
     Implemenation of Prototypical Network.
     """
@@ -33,7 +33,7 @@ class Prototypical_network(Model):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.ReLU(),
 
-            tf.keras.layers.Conv2D(filters=64, kernel_size=1, strides=2 padding='same'),
+            tf.keras.layers.Conv2D(filters=64, kernel_size=1, strides=2, padding='same'),
             tf.keras.layers.BatchNormalization(),
 
             tf.keras.layers.Conv2D(filters=64, kernel_size=1, padding='same'),
@@ -46,7 +46,7 @@ class Prototypical_network(Model):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.ReLU(),
 
-            tf.keras.layers.Conv2D(filters=64, kernel_size=1, strides=2 padding='same'),
+            tf.keras.layers.Conv2D(filters=64, kernel_size=1, strides=2, padding='same'),
             tf.keras.layers.BatchNormalization(),
 
             tf.keras.layers.Conv2D(filters=64, kernel_size=1, padding='same'),
@@ -59,7 +59,7 @@ class Prototypical_network(Model):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.ReLU(),
 
-            tf.keras.layers.Conv2D(filters=64, kernel_size=1, strides=2 padding='same'),
+            tf.keras.layers.Conv2D(filters=64, kernel_size=1, strides=2, padding='same'),
             tf.keras.layers.BatchNormalization(),
 
             tf.keras.layers.Conv2D(filters=64, kernel_size=1, padding='same'),
@@ -72,7 +72,7 @@ class Prototypical_network(Model):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.ReLU(),
 
-            tf.keras.layers.GlobalAvgPool2D())]
+            tf.keras.layers.GlobalAvgPool2D()]
         )
 
     def call(self, support, query):
