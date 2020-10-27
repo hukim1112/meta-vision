@@ -17,7 +17,7 @@ class Bag_of_prototypes(Model):
             w (int): image width .
             c (int): number of channels.
         """
-        super(Prototypical_network, self).__init__()
+        super(Bag_of_prototypes, self).__init__()
         self.w, self.h, self.c = w, h, c
 
         # Encoder as ResNet like CNN with 4 blocks

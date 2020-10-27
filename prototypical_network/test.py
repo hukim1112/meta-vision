@@ -1,19 +1,25 @@
-import os, json
-from util import parser, session_config
+import os, json, argparse
+from data_loader import load_data
+from models import load_model
+from utils import parser, session_config
+import tensorflow as tf
 
 def main():
-    args = parser.get_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config', metavar='config_file',
+                                        help='The name of config file.')
+    args = parser.parse_args()
     config = args.config
     with open(config, "r") as file:
         config = json.load(file)
     test_config = config['test']
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = config['gpu_id']
+    os.environ['CUDA_VISIBLE_DEVICES'] = config['test']['gpu_id']
     session_config.setup_gpus(True, 0.9)
 
-    ds = data_load(['test'], config)
+    ds = load_data(['test'], config)
     test_ds = ds['test']
-    model = model_load('test', config)
+    model = load_model('test', config)
 
     test_loss = tf.metrics.Mean(name='test_loss')
     test_acc = tf.metrics.Mean(name='test_accuracy')      
@@ -21,12 +27,12 @@ def main():
     # Testing process
     print("Testing started.")
     for epoch in range(test_config['n_episode']):
-		support, query = test_ds.get_next_episode()
+        support, query = test_ds.get_next_episode()
         loss, pred, eq, acc = val_step(support, query, model)   	
         test_loss(loss)
         test_acc(acc)
     template = 'Test Loss: {}, Test Accuracy: {}'
-    print(template.format(test_loss.result(), self.test_acc.result()*100))
+    print(template.format(test_loss.result(), test_acc.result()*100))
     print("Testing ended.")
     return
 

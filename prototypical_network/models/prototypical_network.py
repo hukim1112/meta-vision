@@ -103,6 +103,7 @@ class Prototypical_network(Model):
         eq = tf.cast(tf.equal(
             tf.cast(tf.argmax(log_p_y, axis=-1), tf.int32),
             tf.cast(y, tf.int32)), tf.int32)
+        tf.print(eq)
         acc = tf.reduce_mean(eq)
         return eq, acc
 

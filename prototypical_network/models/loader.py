@@ -1,3 +1,4 @@
+import os
 from .prototypical_network import Prototypical_network
 from .bag_of_prototypes import Bag_of_prototypes
 
@@ -43,15 +44,9 @@ def checkpoint_load(model, split, config):
                      for name in os.listdir(checkpoint_dir)]
             latest = sorted(paths, key=os.path.getmtime)[-1]
             model.load(latest)
-        except AttributeError as e:
-            print('Please make sure there is at least one checkpoint at {}'.format(
-                checkpoint_dir))
-            print('The model will be loaded from base weights.')
-            net.init_vgg16()
         except ValueError as e:
             raise ValueError(
-                'Please check the following\n1./ Is the path correct: {}?\n2./ Is the model architecture correct: {}?'.format(
-                    latest, arch))
+                'Please check the following\n1./ Is the path correct: {}?'.format(latest))
         except Exception as e:
             print(e)
             raise ValueError('Please check if checkpoint_dir is specified')
@@ -64,8 +59,7 @@ def checkpoint_load(model, split, config):
             model.load(checkpoint)
         except Exception as e:
             raise ValueError(
-                'Please check the following\n1./ Is the path correct: {}?\n2./ Is the model architecture correct: {}?'.format(
-                    checkpoint, arch))
+                'Please check the following\n1./ Is the path correct: {}?'.format(checkpoint))
     else:
         raise ValueError('Unknown pretrained type: {}'.format(pretrained_type))
     return model

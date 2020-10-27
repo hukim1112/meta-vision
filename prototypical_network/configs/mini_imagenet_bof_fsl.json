@@ -3,7 +3,7 @@
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "input_shape" : [84, 84, 3],
     "model_name" : "bag_of_prototypes",
-    "checkpoint_dir" : "checkpoints",
+    "checkpoint_dir" : "checkpoints/bof",
     "train":
     {        
         "gpu_id" : "1",

@@ -3,7 +3,7 @@
     "data_dir" : "/home/files/datasets/mini_imagenet",
     "input_shape" : [84, 84, 3],
     "model_name" : "prototypical_networks",
-    "checkpoint_dir" : "checkpoints",
+    "checkpoint_dir" : "checkpoints/protonet_lr_up",
     "train":
     {        
         "gpu_id" : "0",
@@ -12,7 +12,7 @@
         "n_way" : 30,
         "n_support" : 5,
         "n_query" : 15,
-        "learning_rate" : 0.001,
+        "learning_rate" : 0.005,
         "patience" : 50,
         "pretrained_type" : "base",
         "checkpoint_name" : "None"
