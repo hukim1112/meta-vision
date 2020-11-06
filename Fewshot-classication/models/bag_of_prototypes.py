@@ -75,68 +75,10 @@ class Bag_of_prototypes(Model):
             tf.keras.layers.GlobalAvgPool2D()]
         )
 
-    def call(self, support, query):
-        n_class = support.shape[0]
-        n_support = support.shape[1]
-        n_query = query.shape[1]
+    def call(self, input):
+        z = self.encoder(input)
+        return z
 
-        # merge support and query to forward through encoder
-        cat = tf.concat([
-            tf.reshape(support, [n_class * n_support,
-                                 self.w, self.h, self.c]),
-            tf.reshape(query, [n_class * n_query,
-                               self.w, self.h, self.c])], axis=0)
-        z = self.encoder(cat)
-
-        # Divide embedding into support and query
-        z_prototypes = tf.reshape(z[:n_class * n_support],
-                                  [n_class, n_support, z.shape[-1]])
-        # Prototypes are means of n_support examples
-        z_prototypes = tf.math.reduce_mean(z_prototypes, axis=1)
-        z_query = z[n_class * n_support:]
-        return z_prototypes, z_query
-
-    @staticmethod
-    def calc_euclidian_dists(x, y):
-        """
-        Calculate euclidian distance between two 3D tensors.
-
-        Args:
-            x (tf.Tensor):
-            y (tf.Tensor):
-
-        Returns (tf.Tensor): 2-dim tensor with distances.
-
-        """
-        n = x.shape[0]
-        m = y.shape[0]
-        x = tf.tile(tf.expand_dims(x, 1), [1, m, 1])
-        y = tf.tile(tf.expand_dims(y, 0), [n, 1, 1])
-        return tf.reduce_mean(tf.math.pow(x - y, 2), 2)
-
-    @staticmethod
-    def calc_probability_with_dists(dists, n_class, n_query):
-        log_p_y = tf.nn.log_softmax(-dists, axis=-1)
-        log_p_y = tf.reshape(log_p_y, [n_class, n_query, -1])
-        return log_p_y
-
-    @staticmethod
-    def loss_func(log_p_y, n_class, n_query):
-        y = np.tile(np.arange(n_class)[:, np.newaxis], (1, n_query))
-        y_onehot = tf.cast(tf.one_hot(y, n_class), tf.float32)
-        loss = -tf.reduce_mean(tf.reshape(tf.reduce_sum(
-                               tf.multiply(y_onehot, log_p_y), axis=-1), [-1]))
-        pred = tf.cast(tf.argmax(log_p_y, axis=-1), tf.int32)
-        return loss, pred
-
-    @staticmethod
-    def cal_metric(log_p_y, n_class, n_query):
-        y = np.tile(np.arange(n_class)[:, np.newaxis], (1, n_query))
-        eq = tf.cast(tf.equal(
-            tf.cast(tf.argmax(log_p_y, axis=-1), tf.int32),
-            tf.cast(y, tf.int32)), tf.int32)
-        acc = tf.reduce_mean(eq)
-        return eq, acc
 
     def save(self, model_path):
         """

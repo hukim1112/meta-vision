@@ -54,15 +54,12 @@ def load_mini_imagenet(splits, config):
         # load dict with 'class_dict' and 'image_data' keys
         with open(ds_filename, 'rb') as f:
             data_dict = pickle.load(f)
-        
+
         # Convert original data to format [n_classes, n_img, w, h, c]
         first_key = list(data_dict['class_dict'])[0]
         data = np.zeros((len(data_dict['class_dict']), len(data_dict['class_dict'][first_key]), 84, 84, 3))
         for i, (k, v) in enumerate(data_dict['class_dict'].items()):
             data[i, :, :, :, :] = data_dict['image_data'][v, :]
-        data /= 255.
-
-        data_loader = DataLoader(data, n_way, n_support, n_query)
-        ds[split] = data_loader
-
+        data /= 255
+        ds[split] = data
     return ds

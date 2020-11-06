@@ -3,7 +3,7 @@ from .prototypical_network import Prototypical_network
 from .bag_of_prototypes import Bag_of_prototypes
 
 
-def load_model(split, config):
+def load_model(config):
     """
     Load specific dataset.
 checkpoint_load(model, pretrained_type, checkpoint_name)
@@ -18,15 +18,9 @@ checkpoint_load(model, pretrained_type, checkpoint_name)
     if config['model_name'] == "prototypical_networks":
         h, w, c = config['input_shape']
         model = Prototypical_network(h, w, c)
-        if split not in ['train', 'test']:
-            raise ValueError('Unknown split name {}'.format(split))
-        model = checkpoint_load(model, split, config)
     elif config['model_name'] == "bag_of_prototypes":
         h, w, c = config['input_shape']
         model = Bag_of_prototypes(h, w, c)
-        if split not in ['train', 'test']:
-            raise ValueError('Unknown split name {}'.format(split))
-        model = checkpoint_load(model, split, config)
     else:
         raise ValueError(f"Unknow model: {config['model_name']}")
     return model
