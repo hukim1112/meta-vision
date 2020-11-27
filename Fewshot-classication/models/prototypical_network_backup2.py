@@ -40,8 +40,7 @@ class Prototypical_network(Model):
             tf.keras.layers.Conv2D(filters=64, kernel_size=3, padding='same'),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.ReLU(),
-            tf.keras.layers.MaxPool2D((2, 2)),
-            tf.keras.layers.GlobalAvgPool2D()]
+            tf.keras.layers.MaxPool2D((2, 2)), Flatten()]
         )
 
     def call(self, input):
